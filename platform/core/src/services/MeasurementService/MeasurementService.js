@@ -570,6 +570,10 @@ class MeasurementService {
     this._broadcastEvent(this.EVENTS.MEASUREMENTS_CLEARED, { measurements });
   }
 
+  onModeEnter() {
+    this.clearMeasurements();
+  }
+
   jumpToMeasurement(viewportIndex, measurementUID) {
     const measurement = this.measurements[measurementUID];
 
