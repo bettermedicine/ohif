@@ -367,6 +367,7 @@ const connectMeasurementServiceToTools = (
       }
 
       const annotationManager = annotation.state.getAnnotationManager();
+
       annotationManager.addAnnotation({
         annotationUID: measurement.uid,
         highlighted: false,
@@ -374,6 +375,8 @@ const connectMeasurementServiceToTools = (
         invalidated: false,
         metadata: {
           toolName: measurement.toolName,
+          viewPlaneNormal: measurement.metadata.viewPlaneNormal,
+          viewUp: measurement.metadata.viewUp,
           FrameOfReferenceUID: measurement.FrameOfReferenceUID,
           referencedImageId: imageId,
         },
