@@ -1,6 +1,70 @@
 import SUPPORTED_TOOLS from './constants/supportedTools';
 import getSOPInstanceAttributes from './utils/getSOPInstanceAttributes';
-import { displaySetService, utils } from '@ohif/core';
+import { utils } from '@ohif/core';
+
+const displaySetByReferencedImageID = (
+  referencedImageId,
+  cornerstoneViewportService,
+  displaySetService,
+  viewportId
+) => {
+  const sopInstanceAttributes = getSOPInstanceAttributes(
+    referencedImageId,
+    cornerstoneViewportService,
+    viewportId
+  );
+  const displaySet = displaySetService.getDisplaySetForSOPInstanceUID(
+    sopInstanceAttributes.SOPInstanceUID,
+    sopInstanceAttributes.SeriesInstanceUID
+  );
+
+  return displaySet;
+};
+
+const displaySetByViewportID = (
+  cornerstoneViewportService,
+  displaySetService,
+  viewportId
+) => {
+  const viewportInfo = cornerstoneViewportService.getViewportInfo(viewportId);
+  const data = viewportInfo?.viewportData?.data?.[0];
+  const displaySet = displaySetService.getDisplaySetByUID(
+    data.displaySetInstanceUID
+  );
+  return displaySet;
+};
+
+const getDisplaySet = (
+  referencedImageId,
+  cornerstoneViewportService,
+  displaySetService,
+  viewportId
+) => {
+  if (referencedImageId) {
+    return displaySetByReferencedImageID(
+      referencedImageId,
+      cornerstoneViewportService,
+      displaySetService,
+      viewportId
+    );
+  } else if (viewportId) {
+    return displaySetByViewportID(
+      cornerstoneViewportService,
+      displaySetService,
+      viewportId
+    );
+  } else {
+    // no viewport ID or referenced image ID was passed so we can either
+    // grab the only valid option or throw here try our luck and just grab the first active displayset
+    const activeDisplaySets = displaySetService.getActiveDisplaySets();
+    if (activeDisplaySets.length > 1) {
+      throw new Error(
+        'Found more than one active displayset in absence of referencedImageID and viewportID!'
+      );
+    }
+    return activeDisplaySets[0];
+  }
+};
 
 const Length = {
   toAnnotation: measurement => {},
@@ -32,37 +96,27 @@ const Length = {
       throw new Error('Tool not supported');
     }
 
-    const {
-      SOPInstanceUID,
-      SeriesInstanceUID,
-      StudyInstanceUID,
-    } = getSOPInstanceAttributes(
+    const displaySet = getDisplaySet(
       referencedImageId,
       cornerstoneViewportService,
+      displaySetService,
       viewportId
     );
-
-    let displaySet;
-
-    if (SOPInstanceUID) {
-      displaySet = displaySetService.getDisplaySetForSOPInstanceUID(
-        SOPInstanceUID,
-        SeriesInstanceUID
-      );
-    } else {
-      displaySet = displaySetService.getDisplaySetsForSeries(SeriesInstanceUID);
-    }
 
     const { points } = data.handles;
 
     const mappedAnnotations = getMappedAnnotations(
       annotation,
-      displaySetService
+      displaySetService,
+      cornerstoneViewportService,
+      viewportId
     );
 
     const displayText = getDisplayText(mappedAnnotations, displaySet);
     const getReport = () =>
       _getReport(mappedAnnotations, points, FrameOfReferenceUID);
+
+    const { SOPInstanceUID, SeriesInstanceUID, StudyInstanceUID } = displaySet;
 
     return {
       uid: annotationUID,
@@ -84,7 +138,12 @@ const Length = {
   },
 };
 
-function getMappedAnnotations(annotation, displaySetService) {
+function getMappedAnnotations(
+  annotation,
+  displaySetService,
+  cornerstoneViewportService,
+  viewportId
+) {
   const { metadata, data } = annotation;
   const { cachedStats } = data;
   const { referencedImageId } = metadata;
@@ -98,33 +157,23 @@ function getMappedAnnotations(annotation, displaySetService) {
   Object.keys(cachedStats).forEach(targetId => {
     const targetStats = cachedStats[targetId];
 
-    if (!referencedImageId) {
-      throw new Error(
-        'Non-acquisition plane measurement mapping not supported'
-      );
-    }
+    const sopInstanceAttributes = getSOPInstanceAttributes(referencedImageId);
 
-    const {
-      SOPInstanceUID,
-      SeriesInstanceUID,
-      frameNumber,
-    } = getSOPInstanceAttributes(referencedImageId);
-
-    const displaySet = displaySetService.getDisplaySetForSOPInstanceUID(
-      SOPInstanceUID,
-      SeriesInstanceUID,
-      frameNumber
+    const displaySet = getDisplaySet(
+      referencedImageId,
+      cornerstoneViewportService,
+      displaySetService,
+      viewportId
     );
 
-    const { SeriesNumber } = displaySet;
     const { length } = targetStats;
     const unit = 'mm';
 
     annotations.push({
-      SeriesInstanceUID,
-      SOPInstanceUID,
-      SeriesNumber,
-      frameNumber,
+      SeriesInstanceUID: displaySet.SeriesInstanceUID,
+      SOPInstanceUID: sopInstanceAttributes?.SOPInstanceUID || undefined,
+      SeriesNumber: displaySet.SeriesInstanceUID,
+      frameNumber: sopInstanceAttributes?.frameNumber | 1,
       unit,
       length,
     });
