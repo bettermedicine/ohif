@@ -169,11 +169,18 @@ function getMappedAnnotations(
     const { length } = targetStats;
     const unit = 'mm';
 
+    let { SOPInstanceUID } = sopInstanceAttributes || {};
+
+    if (!sopInstanceAttributes) {
+      const [activeDisplaySet] = displaySetService.getActiveDisplaySets();
+      SOPInstanceUID = activeDisplaySet.images[0].SOPInstanceUID;
+    }
+
     annotations.push({
       SeriesInstanceUID: displaySet.SeriesInstanceUID,
-      SOPInstanceUID: sopInstanceAttributes?.SOPInstanceUID || undefined,
+      SOPInstanceUID,
       SeriesNumber: displaySet.SeriesInstanceUID,
-      frameNumber: sopInstanceAttributes?.frameNumber | 1,
+      frameNumber: sopInstanceAttributes?.frameNumber || 1,
       unit,
       length,
     });

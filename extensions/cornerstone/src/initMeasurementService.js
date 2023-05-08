@@ -351,7 +351,7 @@ const connectMeasurementServiceToTools = (
       const instance = DicomMetadataStore.getInstance(
         referenceStudyUID,
         referenceSeriesUID,
-        SOPInstanceUID
+        SOPInstanceUID || measurement.metadata.SOPInstanceUID
       );
 
       let imageId;
@@ -363,7 +363,7 @@ const connectMeasurementServiceToTools = (
           measurement.metadata.referencedImageId
         ).frameNumber;
       } else {
-        imageId = dataSource.getImageIdsForInstance({ instance });
+        imageId = dataSource?.getImageIdsForInstance?.({ instance });
       }
 
       const annotationManager = annotation.state.getAnnotationManager();
