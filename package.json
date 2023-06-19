@@ -5,7 +5,9 @@
     "packages": [
       "platform/*",
       "extensions/*",
-      "modes/*"
+      "modes/*",
+      "../ohif-3-extensions/@better-medicine/*",
+      "../ohif-3-modes/@better-medicine/*"
     ],
     "nohoist": [
       "**/html-minifier-terser"
