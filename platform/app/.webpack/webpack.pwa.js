@@ -71,11 +71,11 @@ module.exports = (env, argv) => {
         SRC_DIR,
         path.resolve(
           __dirname,
-          '../../../../ohif-3-extensions/@better-medicine/extension-tuh-clinical-study/node_modules'
+          '../../../../ohif-3-modes/@better-medicine/test-phase/node_modules'
         ),
         path.resolve(
           __dirname,
-          '../../../../ohif-3-modes/@better-medicine/test-phase/node_modules'
+          '../../../../ohif-3-extensions/@better-medicine/extension-tuh-clinical-study/node_modules'
         ),
       ],
     },
