@@ -19,6 +19,42 @@ import { getFirstAnnotationSelected } from './utils/measurementServiceMappings/u
 import getActiveViewportEnabledElement from './utils/getActiveViewportEnabledElement';
 import { CornerstoneServices } from './types';
 
+const EPSILON = 0.0001;
+
+function approxEqual(num1: number, num2: number) {
+  return Math.abs(num1 - num2) < EPSILON;
+}
+
+
+const derivePlaneFromHandles = (handles) => {
+  const [start, end] = handles;
+
+  // Check if start and end points are the same
+  if (
+    approxEqual(start[0], end[0]) &&
+    approxEqual(start[1], end[1]) &&
+    approxEqual(start[2], end[2])
+  ) {
+    return 'none';
+  }
+
+  switch (true) {
+    // only x and y changed, let's default to axial
+    case approxEqual(start[2], end[2]):
+      return 'axial';
+    // x axis didn't change, let's default to sagittal
+    case approxEqual(start[0], end[0]):
+      return 'sagittal';
+    // x and z axes changed, this can only happen in coronal plane
+    case approxEqual(start[1], end[1]):
+      return 'coronal';
+    // All axes changed, this is an oblique plane
+    default:
+      return 'oblique';
+  }
+};
+
+
 function commandsModule({
   servicesManager,
   commandsManager,
@@ -88,9 +124,23 @@ function commandsModule({
     },
 
     getNearbyToolData({ nearbyToolData, element, canvasCoordinates }) {
+      const annotationNearPoint = cstUtils.getAnnotationNearPoint(element, canvasCoordinates, 5);
+
+      const { viewport: { options: { orientation } } } = this.getActiveViewportEnabledElement();
+
+      if (annotationNearPoint) {
+        const plane = derivePlaneFromHandles(annotationNearPoint?.data.handles.points);
+
+        if (plane !== orientation) {
+          console.log('getNearbyToolData selected measurement from wrong plane', plane, orientation);
+
+          return null;
+        }
+      }
+
       return (
         nearbyToolData ??
-        cstUtils.getAnnotationNearPoint(element, canvasCoordinates)
+        annotationNearPoint
       );
     },
     getNearbyAnnotation({ element, canvasCoordinates }) {
