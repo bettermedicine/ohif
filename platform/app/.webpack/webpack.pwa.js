@@ -23,6 +23,7 @@ const PROXY_DOMAIN = process.env.PROXY_DOMAIN;
 const ENTRY_TARGET = process.env.ENTRY_TARGET || `${SRC_DIR}/index.js`;
 const Dotenv = require('dotenv-webpack');
 const writePluginImportFile = require('./writePluginImportsFile.js');
+const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
 
 const copyPluginFromExtensions = writePluginImportFile(SRC_DIR, DIST_DIR);
 
@@ -69,6 +70,14 @@ module.exports = (env, argv) => {
         // Hoisted Yarn Workspace Modules
         path.resolve(__dirname, '../../../node_modules'),
         SRC_DIR,
+        path.resolve(
+          __dirname,
+          '../../../../ohif-3-extensions/@better-medicine/extension-tuh-clinical-study/node_modules'
+        ),
+        path.resolve(
+          __dirname,
+          '../../../../ohif-3-modes/@better-medicine/test-phase/node_modules'
+        ),
       ],
     },
     plugins: [
@@ -134,6 +143,18 @@ module.exports = (env, argv) => {
         // Need to exclude the theme as it is updated independently
         exclude: [/theme/],
       }),
+      ...(isProdBuild &&
+      process.env.SENTRY_ORG &&
+      process.env.SENTRY_PROJECT &&
+      process.env.SENTRY_AUTH_TOKEN
+        ? [
+            sentryWebpackPlugin({
+              org: process.env.SENTRY_ORG,
+              project: process.env.SENTRY_PROJECT,
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+            }),
+          ]
+        : []),
     ],
     // https://webpack.js.org/configuration/dev-server/
     devServer: {
