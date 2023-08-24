@@ -38,11 +38,11 @@ function initDoubleClick({
   commandsManager,
 }: initDoubleClickArgs): void {
   const cornerstoneViewportHandleDoubleClick = (evt: CustomEvent) => {
-    // Do not allow double click on a tool.
-    const nearbyToolData = findNearbyToolData(commandsManager, evt);
-    if (nearbyToolData) {
-      return;
-    }
+    // allow double click on a tool.
+    // const nearbyToolData = findNearbyToolData(commandsManager, evt);
+    // if (nearbyToolData) {
+    //   return;
+    // }
 
     const eventName = getDoubleClickEventName(evt);
 
