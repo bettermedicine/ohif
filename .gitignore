@@ -7,6 +7,7 @@ dist
 docs/_book
 src/version.js
 junit.xml
+test-report.html
 coverage/
 .docz/
 .yarn/
