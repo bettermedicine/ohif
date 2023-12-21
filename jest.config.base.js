@@ -27,6 +27,13 @@ module.exports = {
         addFileAttribute: true, // CircleCI Only
       },
     ],
+    // Outputs: ./test-report.html
+    [
+      'jest-html-reporter',
+      {
+        pageTitle: 'BM Viewer Test Report',
+      },
+    ],
   ],
   collectCoverage: false,
   collectCoverageFrom: [
