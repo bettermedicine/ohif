@@ -32,6 +32,7 @@ module.exports = {
       'jest-html-reporter',
       {
         pageTitle: 'BM Viewer Test Report',
+        outputPath: './viewer-test-report.html',
       },
     ],
   ],
