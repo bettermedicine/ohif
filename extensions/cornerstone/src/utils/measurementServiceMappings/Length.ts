@@ -21,16 +21,10 @@ const displaySetByReferencedImageID = (
   return displaySet;
 };
 
-const displaySetByViewportID = (
-  cornerstoneViewportService,
-  displaySetService,
-  viewportId
-) => {
+const displaySetByViewportID = (cornerstoneViewportService, displaySetService, viewportId) => {
   const viewportInfo = cornerstoneViewportService.getViewportInfo(viewportId);
   const data = viewportInfo?.viewportData?.data?.[0];
-  const displaySet = displaySetService.getDisplaySetByUID(
-    data.displaySetInstanceUID
-  );
+  const displaySet = displaySetService.getDisplaySetByUID(data.displaySetInstanceUID);
   return displaySet;
 };
 
@@ -48,11 +42,7 @@ const getDisplaySet = (
       viewportId
     );
   } else if (viewportId) {
-    return displaySetByViewportID(
-      cornerstoneViewportService,
-      displaySetService,
-      viewportId
-    );
+    return displaySetByViewportID(cornerstoneViewportService, displaySetService, viewportId);
   } else {
     // no viewport ID or referenced image ID was passed so we can either
     // grab the only valid option or throw here try our luck and just grab the first active displayset
@@ -103,7 +93,7 @@ const Length = {
       viewportId
     );
 
-    const { points } = data.handles;
+    const { points, textBox } = data.handles;
 
     const mappedAnnotations = getMappedAnnotations(
       annotation,
@@ -113,8 +103,7 @@ const Length = {
     );
 
     const displayText = getDisplayText(mappedAnnotations, displaySet);
-    const getReport = () =>
-      _getReport(mappedAnnotations, points, FrameOfReferenceUID);
+    const getReport = () => _getReport(mappedAnnotations, points, FrameOfReferenceUID);
 
     const { SOPInstanceUID, SeriesInstanceUID, StudyInstanceUID } = displaySet;
 
@@ -123,6 +112,7 @@ const Length = {
       SOPInstanceUID,
       FrameOfReferenceUID,
       points,
+      textBox,
       metadata,
       referenceSeriesUID: SeriesInstanceUID,
       referenceStudyUID: StudyInstanceUID,
@@ -196,9 +186,11 @@ function _getReport(mappedAnnotations, points, FrameOfReferenceUID) {
   values.push('Cornerstone:Length');
 
   mappedAnnotations.forEach(annotation => {
-    const { length } = annotation;
-    columns.push(`Length (mm)`);
+    const { length, unit } = annotation;
+    columns.push(`Length`);
     values.push(length);
+    columns.push('Unit');
+    values.push(unit);
   });
 
   if (FrameOfReferenceUID) {
@@ -228,16 +220,9 @@ function getDisplayText(mappedAnnotations, displaySet) {
   const displayText = [];
 
   // Area is the same for all series
-  const {
-    length,
-    SeriesNumber,
-    SOPInstanceUID,
-    frameNumber,
-  } = mappedAnnotations[0];
+  const { length, SeriesNumber, SOPInstanceUID, frameNumber, unit } = mappedAnnotations[0];
 
-  const instance = displaySet.images.find(
-    image => image.SOPInstanceUID === SOPInstanceUID
-  );
+  const instance = displaySet.images.find(image => image.SOPInstanceUID === SOPInstanceUID);
 
   let InstanceNumber;
   if (instance) {
@@ -247,10 +232,11 @@ function getDisplayText(mappedAnnotations, displaySet) {
   const instanceText = InstanceNumber ? ` I: ${InstanceNumber}` : '';
   const frameText = displaySet.isMultiFrame ? ` F: ${frameNumber}` : '';
 
+  if (length === null || length === undefined) {
+    return displayText;
+  }
   const roundedLength = utils.roundNumber(length, 2);
-  displayText.push(
-    `${roundedLength} mm (S: ${SeriesNumber}${instanceText}${frameText})`
-  );
+  displayText.push(`${roundedLength} ${unit} (S: ${SeriesNumber}${instanceText}${frameText})`);
 
   return displayText;
 }
