@@ -1,22 +1,17 @@
 import dcmjs from 'dcmjs';
-import {
-  sortStudySeries,
-  sortingCriteria,
-} from '@ohif/core/src/utils/sortStudy';
+import { sortStudySeries, sortingCriteria } from '@ohif/core/src/utils/sortStudy';
 import RetrieveMetadataLoader from './retrieveMetadataLoader';
 
 /**
- * Creates an immutable series loader object which loads each series sequentially using the iterator interface
+ * Creates an immutable series loader object which loads each series sequentially using the iterator interface.
+ *
  * @param {DICOMWebClient} dicomWebClient The DICOMWebClient instance to be used for series load
  * @param {string} studyInstanceUID The Study Instance UID from which series will be loaded
  * @param {Array} seriesInstanceUIDList A list of Series Instance UIDs
+ *
  * @returns {Object} Returns an object which supports loading of instances from each of given Series Instance UID
  */
-function makeSeriesAsyncLoader(
-  client,
-  studyInstanceUID,
-  seriesInstanceUIDList
-) {
+function makeSeriesAsyncLoader(client, studyInstanceUID, seriesInstanceUIDList) {
   return Object.freeze({
     hasNext() {
       return seriesInstanceUIDList.length > 0;
@@ -43,11 +38,7 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
    */
   *getPreLoaders() {
     const preLoaders = [];
-    const {
-      studyInstanceUID,
-      filters: { seriesInstanceUID } = {},
-      client,
-    } = this;
+    const { studyInstanceUID, filters: { seriesInstanceUID } = {}, client } = this;
 
     if (seriesInstanceUID) {
       const options = {
@@ -73,8 +64,7 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
 
     return sortStudySeries(
       naturalized,
-      sortCriteria ||
-        sortingCriteria.seriesSortCriteria.seriesInfoSortingCriteria,
+      sortCriteria || sortingCriteria.seriesSortCriteria.seriesInfoSortingCriteria,
       sortFunction
     );
   }
@@ -84,11 +74,7 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
 
     const seriesInstanceUIDs = preLoadData.map(s => s.SeriesInstanceUID);
 
-    const seriesAsyncLoader = makeSeriesAsyncLoader(
-      client,
-      studyInstanceUID,
-      seriesInstanceUIDs
-    );
+    const seriesAsyncLoader = makeSeriesAsyncLoader(client, studyInstanceUID, seriesInstanceUIDs);
 
     const promises = [];
 
