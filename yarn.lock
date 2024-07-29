@@ -1450,12 +1450,13 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@cornerstonejs/adapters@^1.40.3":
-  version "1.40.3"
-  resolved "https://registry.yarnpkg.com/@cornerstonejs/adapters/-/adapters-1.40.3.tgz#aaf9e86e648bf3e6531f1d16d9439be48aee40f5"
-  integrity sha512-StTYbq1RWBHI9yd2Xax6ebk0PX/pvKDmA4j9+WkBTh1MNnNGxABGpRHSdRKa96YlhGnVM1z5u0Ox5BmBMIAy2w==
+"@cornerstonejs/adapters@^1.66.1":
+  version "1.66.1"
+  resolved "https://registry.yarnpkg.com/@cornerstonejs/adapters/-/adapters-1.66.1.tgz#7ec3e0200b5df87127229815ab012e2412923a63"
+  integrity sha512-mvEYSzw8X5bQZci7cLCmiJVECLLo/NpiGefY8oAacaY3W5hAkI31hS6+OH3RsPjlheYgTWLiGo927jabDdaG5w==
   dependencies:
     "@babel/runtime-corejs2" "^7.17.8"
+    "@cornerstonejs/tools" "^1.66.1"
     buffer "^6.0.3"
     dcmjs "^0.29.8"
     gl-matrix "^3.4.3"
@@ -1513,10 +1514,21 @@
     gl-matrix "^3.4.3"
     lodash.clonedeep "4.5.0"
 
-"@cornerstonejs/dicom-image-loader@^1.40.3":
-  version "1.40.3"
-  resolved "https://registry.yarnpkg.com/@cornerstonejs/dicom-image-loader/-/dicom-image-loader-1.40.3.tgz#2a397bcb306231bf8ead1826d3cb98bc9614ed66"
-  integrity sha512-GaxI9kYmbc8NtbqQAuyv5Ofu91L/ASxcNDKbNVX6rFQ3HQ0n0OspxsarMLKn4oTY0hRFf+3dJYgM+cTmd8obtw==
+"@cornerstonejs/core@^1.66.1":
+  version "1.66.1"
+  resolved "https://registry.yarnpkg.com/@cornerstonejs/core/-/core-1.66.1.tgz#d44eecfba4b1cf91e00365e2d8112eebf59c021a"
+  integrity sha512-QOZjOYuK7l2y2Yze6263x781xD1k8Eglqrj0ec6TCW9Dcrej9Js4pScQHIscGu0ng1BIakB6WOxFgkVPvQK5/w==
+  dependencies:
+    "@kitware/vtk.js" "29.7.0"
+    comlink "^4.4.1"
+    detect-gpu "^5.0.22"
+    gl-matrix "^3.4.3"
+    lodash.clonedeep "4.5.0"
+
+"@cornerstonejs/dicom-image-loader@^1.63.4":
+  version "1.63.4"
+  resolved "https://registry.yarnpkg.com/@cornerstonejs/dicom-image-loader/-/dicom-image-loader-1.63.4.tgz#6827cb9d3d840dcd6a798e884a169adcc6bba311"
+  integrity sha512-agnRjhIBFiYQ6gQTjHmio+DG79OTaNXU3NbEVVxWdahqR1MnJBX39FT+1mi+8AhbN9sH2f+IpB4MoqraNFetLw==
   dependencies:
     "@cornerstonejs/codec-charls" "^1.2.3"
     "@cornerstonejs/codec-libjpeg-turbo-8bit" "^1.2.2"
@@ -1527,20 +1539,22 @@
     pako "^2.0.4"
     uuid "^9.0.0"
 
-"@cornerstonejs/streaming-image-volume-loader@^1.40.3":
-  version "1.40.3"
-  resolved "https://registry.yarnpkg.com/@cornerstonejs/streaming-image-volume-loader/-/streaming-image-volume-loader-1.40.3.tgz#bf3f5e53a9986c2400dc62d8d13ee138fc192b4a"
-  integrity sha512-QYgdlKOvJxDyoD+2LxlY1EAaxKza0b/2dD65u1055qWvfWWJe8sqipGUbuDtShlcDdCSZLe6oPCHV5IVFhI5cQ==
+"@cornerstonejs/streaming-image-volume-loader@^1.66.1":
+  version "1.66.1"
+  resolved "https://registry.yarnpkg.com/@cornerstonejs/streaming-image-volume-loader/-/streaming-image-volume-loader-1.66.1.tgz#02089ba56d923b178a4e03265127e5412ff54ec9"
+  integrity sha512-IpAY2UON8q4GNxrQ+AyKpyKxrs7OEWc2Cyw5fG1fh98jF1TWLX/LsWyvcm8cEpQhjE3KUh36a2fbnmRQJavOEw==
   dependencies:
-    "@cornerstonejs/core" "^1.40.3"
+    "@cornerstonejs/core" "^1.66.1"
     comlink "^4.4.1"
 
-"@cornerstonejs/tools@^1.40.3":
-  version "1.40.3"
-  resolved "https://registry.yarnpkg.com/@cornerstonejs/tools/-/tools-1.40.3.tgz#2878185a5b848bd07e0a90482a2661525c2e2df8"
-  integrity sha512-h5+AibxT19nUPg5mTJ0v6xwyjUcN+a4Y1tLo9/mZmzjqLEUk4VljNAtcIj+bRPplNqET5sygZ/StOwC94fFItQ==
+"@cornerstonejs/tools@^1.66.1":
+  version "1.66.1"
+  resolved "https://registry.yarnpkg.com/@cornerstonejs/tools/-/tools-1.66.1.tgz#cd9e4fab72bb7708499731cd08126412ad7ff592"
+  integrity sha512-UI/lOkr1pMbYztWxcijh/7wmgo3GoKr+OySS481ZuuC47ogEt+4dYyL6PwbxmbTNOMl3U9sxV/QPWGDPVnIZpg==
   dependencies:
-    "@cornerstonejs/core" "^1.40.3"
+    "@cornerstonejs/core" "^1.66.1"
+    "@icr/polyseg-wasm" "0.4.0"
+    "@types/offscreencanvas" "2019.7.3"
     comlink "^4.4.1"
     lodash.clonedeep "4.5.0"
     lodash.get "^4.4.2"
@@ -6826,6 +6840,33 @@ balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
+
+bare-events@^2.0.0, bare-events@^2.2.0:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/bare-events/-/bare-events-2.2.1.tgz#7b6d421f26a7a755e20bf580b727c84b807964c1"
+  integrity sha512-9GYPpsPFvrWBkelIhOhTWtkeZxVxZOdb3VnFTCzlOo3OjvmTvzLoZFUT8kNFACx0vJej6QPney1Cf9BvzCNE/A==
+
+bare-fs@^2.1.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/bare-fs/-/bare-fs-2.2.1.tgz#c1985d8d3e07a178956b072d3af67cb8c1fa9391"
+  integrity sha512-+CjmZANQDFZWy4PGbVdmALIwmt33aJg8qTkVjClU6X4WmZkTPBDxRHiBn7fpqEWEfF3AC2io++erpViAIQbSjg==
+  dependencies:
+    bare-events "^2.0.0"
+    bare-os "^2.0.0"
+    bare-path "^2.0.0"
+    streamx "^2.13.0"
+
+bare-os@^2.0.0, bare-os@^2.1.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/bare-os/-/bare-os-2.2.0.tgz#24364692984d0bd507621754781b31d7872736b2"
+  integrity sha512-hD0rOPfYWOMpVirTACt4/nK8mC55La12K5fY1ij8HAdfQakD62M+H4o4tpfKzVGLgRDTuk3vjA4GqGXXCeFbag==
+
+bare-path@^2.0.0, bare-path@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/bare-path/-/bare-path-2.1.0.tgz#830f17fd39842813ca77d211ebbabe238a88cb4c"
+  integrity sha512-DIIg7ts8bdRKwJRJrUMy/PICEaQZaPGZ26lsSx9MJSwIhSrcdHn7/C8W+XmnG/rKi6BaRcz+JO00CjZteybDtw==
+  dependencies:
+    bare-os "^2.1.0"
 
 base16@^1.0.0:
   version "1.0.0"
@@ -19479,10 +19520,10 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.1.tgz#d7088281559ab2778424279b0877da3c392d5a3d"
   integrity sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==
 
-streamx@^2.15.0:
-  version "2.15.6"
-  resolved "https://registry.yarnpkg.com/streamx/-/streamx-2.15.6.tgz#28bf36997ebc7bf6c08f9eba958735231b833887"
-  integrity sha512-q+vQL4AAz+FdfT137VF69Cc/APqUbxy+MDOImRrMvchJpigHj9GksgDU2LYbO9rx7RX6osWgxJB2WxhYv4SZAw==
+streamx@^2.13.0, streamx@^2.15.0:
+  version "2.16.1"
+  resolved "https://registry.yarnpkg.com/streamx/-/streamx-2.16.1.tgz#2b311bd34832f08aa6bb4d6a80297c9caef89614"
+  integrity sha512-m9QYj6WygWyWa3H1YY69amr4nVgy61xfjys7xO7kviL5rfIEc2naf+ewFiOA+aEJD7y0JO3h2GoiUv4TDwEGzQ==
   dependencies:
     fast-fifo "^1.1.0"
     queue-tick "^1.0.1"
