@@ -22,8 +22,8 @@ export default class MicroscopyService extends PubSubService {
     return {
       name: 'microscopyService',
       altName: 'MicroscopyService',
-      create: (props) => {
-        return new MicroscopyService(props);
+      create: ({ configuration = {} }) => {
+        return new MicroscopyService(servicesManager);
       },
     };
   };
@@ -36,10 +36,9 @@ export default class MicroscopyService extends PubSubService {
   selectedAnnotation = null;
   pendingFocus = false;
 
-  constructor({ servicesManager, extensionManager }) {
+  constructor(servicesManager) {
     super(EVENTS);
     this.servicesManager = servicesManager;
-    this.peerImport = extensionManager.appConfig.peerImport;
     this._onRoiAdded = this._onRoiAdded.bind(this);
     this._onRoiModified = this._onRoiModified.bind(this);
     this._onRoiRemoved = this._onRoiRemoved.bind(this);
@@ -325,11 +324,11 @@ export default class MicroscopyService extends PubSubService {
 
     let derivedDisplaySets = FrameOfReferenceUID
       ? displaySets.filter(
-          ds =>
-            ds.ReferencedFrameOfReferenceUID === FrameOfReferenceUID ||
-            // sometimes each depth instance has the different FrameOfReferenceID
-            othersFrameOfReferenceUID.includes(ds.ReferencedFrameOfReferenceUID)
-        )
+        ds =>
+          ds.ReferencedFrameOfReferenceUID === FrameOfReferenceUID ||
+          // sometimes each depth instance has the different FrameOfReferenceID
+          othersFrameOfReferenceUID.includes(ds.ReferencedFrameOfReferenceUID)
+      )
       : [];
 
     if (!derivedDisplaySets.length) {

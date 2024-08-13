@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import MeasurementItem from './MeasurementItem';
 
 const MeasurementTable = ({
-  data = [],
+  data,
   title,
-  onClick = () => {},
-  onEdit = () => {},
+  onClick,
+  onEdit,
   onDelete,
   servicesManager,
 }: withAppTypes) => {

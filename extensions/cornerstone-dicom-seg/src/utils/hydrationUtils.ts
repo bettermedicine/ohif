@@ -11,7 +11,6 @@ import { Enums, cache } from '@cornerstonejs/core';
  * @param params.loadFn - Function to load the segmentation data.
  * @param params.servicesManager - The services manager.
  * @param params.displaySet -  the display set.
- * @param params.initialSliceIndex - The initial slice index.
  *
  * @returns Returns true upon successful update of viewports for segmentation rendering.
  */
@@ -20,13 +19,11 @@ async function updateViewportsForSegmentationRendering({
   loadFn,
   servicesManager,
   displaySet,
-  initialSliceIndex = null,
 }: {
   viewportId: string;
   loadFn: () => Promise<string>;
   servicesManager: AppTypes.ServicesManager;
   displaySet?: any;
-  initialSliceIndex?: number;
 }) {
   const { cornerstoneViewportService, segmentationService, viewportGridService } =
     servicesManager.services;

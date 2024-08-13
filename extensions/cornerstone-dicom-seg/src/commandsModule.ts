@@ -48,7 +48,6 @@ const commandsModule = ({
     displaySetService,
     viewportGridService,
     toolGroupService,
-    cornerstoneViewportService,
   } = servicesManager.services;
 
   const actions = {

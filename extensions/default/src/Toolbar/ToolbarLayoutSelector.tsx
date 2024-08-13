@@ -126,7 +126,7 @@ function ToolbarLayoutSelectorWithServices({
 function LayoutSelector({
   rows = 3,
   columns = 4,
-  onLayoutChange = () => {},
+  onLayoutChange = () => { },
   className,
   onSelection,
   onSelectionPreset,
@@ -241,6 +241,12 @@ LayoutSelector.propTypes = {
   columns: PropTypes.number,
   onLayoutChange: PropTypes.func,
   servicesManager: PropTypes.object.isRequired,
+};
+
+LayoutSelector.defaultProps = {
+  columns: 4,
+  rows: 3,
+  onLayoutChange: () => { },
 };
 
 export default ToolbarLayoutSelectorWithServices;

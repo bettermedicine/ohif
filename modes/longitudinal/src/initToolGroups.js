@@ -154,7 +154,6 @@ function initSRToolGroup(extensionManager, toolGroupService) {
       { toolName: SRToolNames.SRCircleROI },
       { toolName: SRToolNames.SRPlanarFreehandROI },
       { toolName: SRToolNames.SRRectangleROI },
-      { toolName: toolNames.WindowLevelRegion },
       {
         toolName: SRToolNames.SRPlanarFreehandContourSegmentation,
         configuration: {
@@ -238,7 +237,6 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager, m
       { toolName: toolNames.CobbAngle },
       { toolName: toolNames.PlanarFreehandROI },
       { toolName: toolNames.SegmentationDisplay },
-      { toolName: toolNames.WindowLevelRegion },
       {
         toolName: toolNames.PlanarFreehandContourSegmentation,
         configuration: {

@@ -1,5 +1,5 @@
 import { PubSubService } from '@ohif/core';
-import { Types as OhifTypes } from '@ohif/core';
+import * as OhifTypes from '@ohif/core/types';
 import {
   RenderingEngine,
   StackViewport,
@@ -814,16 +814,12 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
     // load any secondary displaySets
     const displaySetInstanceUIDs = this.viewportsDisplaySets.get(viewport.id);
 
-    // Can be SEG or RTSTRUCT for now but not PMAP
-    const segOrRTSOverlayDisplaySet = displaySetInstanceUIDs
+    // can be SEG or RTSTRUCT for now
+    const overlayDisplaySet = displaySetInstanceUIDs
       .map(displaySetService.getDisplaySetByUID)
-      .find(
-        displaySet =>
-          displaySet?.isOverlayDisplaySet && ['SEG', 'RTSTRUCT'].includes(displaySet.Modality)
-      );
-
-    if (segOrRTSOverlayDisplaySet) {
-      this.addOverlayRepresentationForDisplaySet(segOrRTSOverlayDisplaySet, viewport);
+      .find(displaySet => displaySet?.isOverlayDisplaySet);
+    if (overlayDisplaySet) {
+      this.addOverlayRepresentationForDisplaySet(overlayDisplaySet, viewport);
     } else {
       // If the displaySet is not a SEG displaySet we assume it is a primary displaySet
       // and we can look into hydrated segmentations to check if any of them are
@@ -1006,8 +1002,8 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
       const { dimensions } = imageVolume;
       const slabThickness = Math.sqrt(
         dimensions[0] * dimensions[0] +
-          dimensions[1] * dimensions[1] +
-          dimensions[2] * dimensions[2]
+        dimensions[1] * dimensions[1] +
+        dimensions[2] * dimensions[2]
       );
 
       return slabThickness;

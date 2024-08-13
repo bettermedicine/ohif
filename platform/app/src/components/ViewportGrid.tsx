@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { useAppConfig } from '@state';
 
 function ViewerViewportGrid(props: withAppTypes) {
-  const { servicesManager, viewportComponents = [], dataSource } = props;
+  const { servicesManager, viewportComponents, dataSource } = props;
   const [viewportGrid, viewportGridService] = useViewportGrid();
   const [appConfig] = useAppConfig();
 
@@ -24,6 +24,7 @@ function ViewerViewportGrid(props: withAppTypes) {
   });
   const layoutHash = useRef(null);
 
+  // TODO -> Need some way of selecting which displaySets hit the viewports.
   const { displaySetService, measurementService, hangingProtocolService, uiNotificationService } =
     servicesManager.services;
 
@@ -341,6 +342,10 @@ function ViewerViewportGrid(props: withAppTypes) {
 ViewerViewportGrid.propTypes = {
   viewportComponents: PropTypes.array.isRequired,
   servicesManager: PropTypes.instanceOf(Object).isRequired,
+};
+
+ViewerViewportGrid.defaultProps = {
+  viewportComponents: [],
 };
 
 function _getViewportComponent(displaySets, viewportComponents, uiNotificationService) {
