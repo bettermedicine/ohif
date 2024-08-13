@@ -100,7 +100,6 @@ export default async function init({
     hangingProtocolService,
     viewportGridService,
     stateSyncService,
-    studyPrefetcherService,
   } = servicesManager.services;
 
   window.services = servicesManager.services;

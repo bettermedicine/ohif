@@ -327,13 +327,18 @@ function CustomizableViewportOverlay({
   );
 }
 
-/**
- * Gets an array of display sets for the given viewport, based on the viewport data.
- * Returns null if none found.
- */
-function getDisplaySets(viewportData, displaySetService) {
-  if (!viewportData?.data?.length) {
-    return null;
+function _getViewportInstances(viewportData) {
+  const imageIds = [];
+  if (viewportData.viewportType === Enums.ViewportType.STACK) {
+    imageIds.push(viewportData.data[0].imageIds[0]);
+  } else if (viewportData.viewportType === Enums.ViewportType.ORTHOGRAPHIC) {
+    const volumes = viewportData.data;
+    volumes.forEach(volume => {
+      if (!volume?.imageIds || volume.imageIds.length === 0) {
+        return;
+      }
+      imageIds.push(volume.imageIds[0]);
+    });
   }
   const displaySets = viewportData.data.map(datum => displaySetService.getDisplaySetByUID(datum.displaySetInstanceUID)).filter(it => !!it);
   if (!displaySets.length) {

@@ -128,9 +128,7 @@ const CornerstoneViewportDownloadForm = ({
           // for some reason we need a reset camera here, and I don't know why
           downloadViewport.resetCamera();
           const presentation = activeViewport.getViewPresentation();
-          if (downloadViewport.setView) {
-            downloadViewport.setView(activeViewport.getViewReference(), presentation);
-          }
+          downloadViewport.setViewPresentation(presentation);
           downloadViewport.render();
         }
       );

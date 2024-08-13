@@ -14,7 +14,7 @@ const MEASUREMENT_TRACKING_EXTENSION_ID = '@ohif/extension-measurement-tracking'
 
 const SR_TOOLGROUP_BASE_NAME = 'SRToolGroup';
 
-function OHIFCornerstoneSRMeasurementViewport(props: withAppTypes) {
+function OHIFCornerstoneSRViewport(props: withAppTypes) {
   const { children, dataSource, displaySets, viewportOptions, servicesManager, extensionManager } =
     props;
 

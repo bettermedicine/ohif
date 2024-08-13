@@ -14,7 +14,6 @@ import UserAuthenticationServiceType from '../services/UserAuthenticationService
 import PanelServiceType from '../services/PanelService';
 import UIDialogServiceType from '../services/UIDialogService';
 import UIViewportDialogServiceType from '../services/UIViewportDialogService';
-import StudyPrefetcherServiceType from '../services/StudyPrefetcherService';
 
 import ServicesManagerType from '../services/ServicesManager';
 import CommandsManagerType from '../classes/CommandsManager';
@@ -42,7 +41,6 @@ declare global {
     export type UIDialogService = UIDialogServiceType;
     export type UIViewportDialogService = UIViewportDialogServiceType;
     export type PanelService = PanelServiceType;
-    export type StudyPrefetcherService = StudyPrefetcherServiceType;
 
     export interface Managers {
       servicesManager?: ServicesManager;
@@ -66,14 +64,12 @@ declare global {
       uiDialogService?: UIDialogServiceType;
       uiViewportDialogService?: UIViewportDialogServiceType;
       panelService?: PanelServiceType;
-      studyPrefetcherService?: StudyPrefetcherServiceType;
     }
     export interface Config {
       routerBasename?: string;
       customizationService?: any;
       extensions?: string[];
       modes?: string[];
-      experimentalStudyBrowserSort?: boolean;
       defaultDataSourceName?: string;
       hotkeys?: Record<string, Hotkey> | Hotkey[];
       useSharedArrayBuffer?: 'AUTO' | 'FALSE' | 'TRUE';
@@ -122,20 +118,6 @@ declare global {
       onConfiguration?: (dicomWebConfig: any, options: any) => any;
       dataSources?: any;
       oidc?: any;
-      peerImport?: (moduleId: string) => Promise<any>;
-      studyPrefetcher: {
-        enabled: boolean;
-        displaySetsCount: number;
-        maxNumPrefetchRequests: number;
-        order: 'closest' | 'downward' | 'upward';
-      }
-  }
-
-    export interface Test {
-      services?: Services;
-      commandsManager?: CommandsManager;
-      extensionManager?: ExtensionManager;
-      config?: Config;
     }
   }
 
