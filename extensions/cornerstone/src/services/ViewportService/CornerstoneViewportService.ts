@@ -1133,7 +1133,7 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
       });
 
       // Resize and render the rendering engine again.
-      renderingEngine.resize(isImmediate);
+      renderingEngine.resize(isImmediate, true);
       renderingEngine.render();
     } catch (e) {
       // This can happen if the resize is too close to navigation or shutdown
