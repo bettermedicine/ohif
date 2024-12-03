@@ -423,6 +423,7 @@ const connectMeasurementServiceToTools = (measurementService, cornerstoneViewpor
           toolName: measurement.toolName,
           FrameOfReferenceUID: measurement.FrameOfReferenceUID,
           referencedImageId: imageId,
+          viewPlaneNormal: measurement.metadata.viewPlaneNormal,
         },
         data: {
           /**
