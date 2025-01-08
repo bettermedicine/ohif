@@ -1,8 +1,9 @@
-import { PubSubService } from '../_shared/pubSubServiceInterface';
 import { ExtensionManager } from '../../extensions';
+import { DisplaySet } from '../../types';
+import { Logger } from '../../utils';
+import { PubSubService } from '../_shared/pubSubServiceInterface';
 import ServicesManager from '../ServicesManager';
 import ViewportGridService from '../ViewportGridService';
-import { DisplaySet } from '../../types';
 
 enum RequestType {
   /** Highest priority for loading*/
@@ -136,6 +137,7 @@ class StudyPrefetcherService extends PubSubService {
   public imageLoadPoolManager: IImageLoadPoolManager;
   public imageLoader: IImageLoader;
   public imageLoadEventsManager: IImageLoadEventsManager;
+  public logger: Logger;
 
   public static REGISTRATION = {
     name: 'studyPrefetcherService',
@@ -159,6 +161,10 @@ class StudyPrefetcherService extends PubSubService {
     configuration: StudyPrefetcherConfig;
   }) {
     super(EVENTS);
+
+    this.logger = new Logger();
+    this.logger.addPrefix('StudyPrefetcherService');
+    this.logger.debug('initializing');
 
     this._servicesManager = servicesManager;
     this._extensionManager = extensionManager;
@@ -562,7 +568,7 @@ class StudyPrefetcherService extends PubSubService {
       return;
     }
 
-    console.warn(`An error ocurred when trying to load "${imageRequest.imageId}"`, error);
+    this.logger.warn(`An error ocurred when trying to load "${imageRequest.imageId}"`, error);
 
     const { imageId } = imageRequest;
 
@@ -651,7 +657,7 @@ class StudyPrefetcherService extends PubSubService {
     }
 
     if (!this.config.enabled) {
-      console.log('StudyPrefetcher is not enabled');
+      this.logger.log('StudyPrefetcher is not enabled');
       return;
     }
 

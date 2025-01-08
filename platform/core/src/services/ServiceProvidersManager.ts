@@ -1,4 +1,4 @@
-import log from './../log.js';
+import { Logger } from '../utils';
 
 /**
  * The ServiceProvidersManager allows for a React context provider class to be registered
@@ -8,23 +8,29 @@ import log from './../log.js';
  */
 export default class ServiceProvidersManager {
   public providers = {};
+  public logger: Logger;
 
   public constructor() {
     this.providers = {};
+    this.logger = new Logger();
+    this.logger.addPrefix('ServiceProvidersManager');
+    this.logger.debug('initializing');
   }
 
   registerProvider(serviceName, provider) {
     if (!serviceName) {
-      log.warn(
+      this.logger.warn(
         'Attempting to register a provider to a null/undefined service name. Exiting early.'
       );
       return;
     }
 
     if (!provider) {
-      log.warn('Attempting to register a null/undefined provider. Exiting early.');
+      this.logger.warn('Attempting to register a null/undefined provider. Exiting early.');
       return;
     }
+
+    this.logger.debug(`Registering provider for service: ${serviceName}`);
 
     this.providers[serviceName] = provider;
   }

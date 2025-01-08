@@ -1,4 +1,4 @@
-import log from '../../log';
+import { Logger } from '../../utils';
 import guid from '../../utils/guid';
 import { PubSubService } from '../_shared/pubSubServiceInterface';
 
@@ -116,6 +116,7 @@ class MeasurementService extends PubSubService {
   public static readonly EVENTS = EVENTS;
   public static VALUE_TYPES = VALUE_TYPES;
   public readonly VALUE_TYPES = VALUE_TYPES;
+  public logger: Logger;
 
   private measurements = new Map();
   private unmappedMeasurements = new Map();
@@ -124,6 +125,10 @@ class MeasurementService extends PubSubService {
     super(EVENTS);
     this.sources = {};
     this.mappings = {};
+
+    this.logger = new Logger();
+    this.logger.addPrefix('MeasurementService');
+    this.logger.debug('initializing');
   }
 
   /**
@@ -152,7 +157,7 @@ class MeasurementService extends PubSubService {
 
     // check if valuetype is valid , and if values are strings
     if (!valueType || typeof valueType !== 'object') {
-      console.warn(`MeasurementService: addValueType: invalid valueType: ${valueType}`);
+      this.logger.warn(`MeasurementService: addValueType: invalid valueType: ${valueType}`);
       return;
     }
 
@@ -243,7 +248,7 @@ class MeasurementService extends PubSubService {
       return this.getAnnotation(source, annotationType, measurementId);
     };
 
-    log.info(`New '${name}@${version}' source added.`);
+    this.logger.info(`New '${name}@${version}' source added.`);
     this.sources[uid] = source;
 
     return source;
@@ -307,7 +312,9 @@ class MeasurementService extends PubSubService {
       this.mappings[source.uid] = [mapping];
     }
 
-    log.info(`New measurement mapping added to source '${this._getSourceToString(source)}'.`);
+    this.logger.info(
+      `New measurement mapping added to source '${this._getSourceToString(source)}'.`
+    );
   }
 
   /**
@@ -320,12 +327,12 @@ class MeasurementService extends PubSubService {
    */
   getAnnotation(source, annotationType, measurementUID) {
     if (!this._isValidSource(source)) {
-      log.warn('Invalid source. Exiting early.');
+      this.logger.warn('Invalid source. Exiting early.');
       return;
     }
 
     if (!annotationType) {
-      log.warn('No source annotationType provided. Exiting early.');
+      this.logger.warn('No source annotationType provided. Exiting early.');
       return;
     }
 
@@ -339,7 +346,7 @@ class MeasurementService extends PubSubService {
     const matchingMapping = this._getMatchingMapping(source, annotationType, measurement);
 
     if (matchingMapping) {
-      log.info('Matching mapping found:', matchingMapping);
+      this.logger.info('Matching mapping found:', matchingMapping);
       const { toAnnotationSchema, annotationType } = matchingMapping;
       return toAnnotationSchema(measurement, annotationType);
     }
@@ -355,7 +362,7 @@ class MeasurementService extends PubSubService {
       modifiedTimestamp: Math.floor(Date.now() / 1000),
     };
 
-    log.info(`Updating internal measurement representation...`, updatedMeasurement);
+    this.logger.info(`Updating internal measurement representation...`, updatedMeasurement);
 
     this.measurements.set(measurementUID, updatedMeasurement);
 
@@ -379,19 +386,19 @@ class MeasurementService extends PubSubService {
    */
   addRawMeasurement(source, annotationType, data, toMeasurementSchema, dataSource = {}) {
     if (!this._isValidSource(source)) {
-      log.warn('Invalid source. Exiting early.');
+      this.logger.warn('Invalid source. Exiting early.');
       return;
     }
 
     const sourceInfo = this._getSourceToString(source);
 
     if (!annotationType) {
-      log.warn('No source annotationType provided. Exiting early.');
+      this.logger.warn('No source annotationType provided. Exiting early.');
       return;
     }
 
     if (!this._sourceHasMappings(source)) {
-      log.warn(`No measurement mappings found for '${sourceInfo}' source. Exiting early.`);
+      this.logger.warn(`No measurement mappings found for '${sourceInfo}' source. Exiting early.`);
       return;
     }
 
@@ -400,7 +407,7 @@ class MeasurementService extends PubSubService {
       measurement = toMeasurementSchema(data);
       measurement.source = source;
     } catch (error) {
-      log.warn(
+      this.logger.warn(
         `Failed to map '${sourceInfo}' measurement for annotationType ${annotationType}:`,
         error.message
       );
@@ -408,7 +415,7 @@ class MeasurementService extends PubSubService {
     }
 
     if (!this._isValidMeasurement(measurement)) {
-      log.warn(
+      this.logger.warn(
         `Attempting to add or update a invalid measurement provided by '${sourceInfo}'. Exiting early.`
       );
       return;
@@ -417,7 +424,7 @@ class MeasurementService extends PubSubService {
     let internalUID = data.id;
     if (!internalUID) {
       internalUID = guid();
-      log.warn(`Measurement ID not found. Generating UID: ${internalUID}`);
+      this.logger.warn(`Measurement ID not found. Generating UID: ${internalUID}`);
     }
 
     const annotationData = data.annotation.data;
@@ -438,7 +445,7 @@ class MeasurementService extends PubSubService {
         measurement: newMeasurement,
       });
     } else {
-      log.info('Measurement added', newMeasurement);
+      this.logger.info('Measurement added', newMeasurement);
       this.measurements.set(internalUID, newMeasurement);
       this._broadcastEvent(this.EVENTS.RAW_MEASUREMENT_ADDED, {
         source,
@@ -480,7 +487,7 @@ class MeasurementService extends PubSubService {
         mapping => mapping.annotationType === annotationType
       );
       if (!sourceMapping) {
-        console.log('No source mapping', source);
+        this.logger.log('No source mapping', source);
         return;
       }
       const { toMeasurementSchema } = sourceMapping;
@@ -503,7 +510,7 @@ class MeasurementService extends PubSubService {
         },
       });
 
-      console.log('Failed to map', error);
+      this.logger.log('Failed to map', error);
       throw new Error(
         `Failed to map '${sourceInfo}' measurement for annotationType ${annotationType}: ${error.message}`
       );
@@ -519,7 +526,7 @@ class MeasurementService extends PubSubService {
     let internalUID = sourceAnnotationDetail.uid;
     if (!internalUID) {
       internalUID = guid();
-      log.info(
+      this.logger.info(
         `Annotation does not have UID, Generating UID for the created Measurement: ${internalUID}`
       );
     }
@@ -544,14 +551,14 @@ class MeasurementService extends PubSubService {
           notYetUpdatedAtSource: false,
         });
       } else {
-        log.info('Measurement added.', newMeasurement);
+        this.logger.info('Measurement added.', newMeasurement);
         this._broadcastEvent(this.EVENTS.MEASUREMENT_ADDED, {
           source,
           measurement: newMeasurement,
         });
       }
     } else {
-      log.info('Measurement started.', newMeasurement);
+      this.logger.info('Measurement started.', newMeasurement);
       this.measurements.set(internalUID, newMeasurement);
     }
 
@@ -568,7 +575,7 @@ class MeasurementService extends PubSubService {
       this.measurements.get(measurementUID) || this.unmappedMeasurements.get(measurementUID);
 
     if (!measurementUID || !measurement) {
-      console.debug(`No uid provided, or unable to find measurement by uid.`);
+      this.logger.debug(`No uid provided, or unable to find measurement by uid.`);
       return;
     }
 
@@ -619,7 +626,7 @@ class MeasurementService extends PubSubService {
     const measurement = this.measurements.get(measurementUID);
 
     if (!measurement) {
-      log.warn(`No measurement uid, or unable to find by uid.`);
+      this.logger.warn(`No measurement uid, or unable to find by uid.`);
       return;
     }
     const consumableEvent = this.createConsumableEvent({
@@ -709,7 +716,7 @@ class MeasurementService extends PubSubService {
   _isValidMeasurement(measurementData) {
     return Object.keys(measurementData).every(key => {
       if (!MEASUREMENT_SCHEMA_KEYS.includes(key)) {
-        log.warn(`Invalid measurement key: ${key}`);
+        this.logger.warn(`Invalid measurement key: ${key}`);
         return false;
       }
 
@@ -740,7 +747,7 @@ class MeasurementService extends PubSubService {
     const measurement = this.measurements.get(measurementUID);
 
     if (!measurement) {
-      console.debug(`No measurement found for uid: ${measurementUID}`);
+      this.logger.debug(`No measurement found for uid: ${measurementUID}`);
       return;
     }
 
@@ -757,7 +764,7 @@ class MeasurementService extends PubSubService {
     const measurement = this.measurements.get(measurementUID);
 
     if (!measurement) {
-      console.debug(`No measurement found for uid: ${measurementUID}`);
+      this.logger.debug(`No measurement found for uid: ${measurementUID}`);
       return;
     }
 
@@ -774,7 +781,7 @@ class MeasurementService extends PubSubService {
     const measurement = this.measurements.get(measurementUID);
 
     if (!measurement) {
-      console.debug(`No measurement found for uid: ${measurementUID}`);
+      this.logger.debug(`No measurement found for uid: ${measurementUID}`);
       return;
     }
 

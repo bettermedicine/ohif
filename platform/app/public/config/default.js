@@ -6,6 +6,7 @@ window.config = {
   // whiteLabeling: {},
   extensions: [],
   modes: [],
+  logLevels: ['log', 'info', 'warn', 'error', 'debug'],
   customizationService: {},
   showStudyList: true,
   // some windows systems have issues with more than 3 web workers

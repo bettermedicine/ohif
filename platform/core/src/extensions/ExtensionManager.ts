@@ -1,9 +1,9 @@
-import MODULE_TYPES from './MODULE_TYPES';
-import log from '../log';
+import { CommandsManager, HotkeysManager } from '../classes';
 import { PubSubService, ServiceProvidersManager } from '../services';
-import { HotkeysManager, CommandsManager } from '../classes';
 import type { DataSourceDefinition } from '../types';
 import type AppTypes from '../types/AppTypes';
+import { Logger } from '../utils';
+import MODULE_TYPES from './MODULE_TYPES';
 
 /**
  * This is the arguments given to create the extension.
@@ -72,6 +72,8 @@ export default class ExtensionManager extends PubSubService {
 
   public static readonly MODULE_TYPES = MODULE_TYPES;
 
+  public logger: Logger;
+
   private _commandsManager: CommandsManager;
   private _servicesManager: AppTypes.ServicesManager;
   private _hotkeysManager: HotkeysManager;
@@ -102,6 +104,11 @@ export default class ExtensionManager extends PubSubService {
     this.modules = {};
     this.registeredExtensionIds = [];
     this.moduleTypeNames = Object.values(MODULE_TYPES);
+
+    this.logger = new Logger();
+    this.logger.addPrefix('ExtensionManager');
+    this.logger.debug('initializing');
+
     //
     this._commandsManager = commandsManager;
     this._servicesManager = servicesManager;
@@ -263,12 +270,12 @@ export default class ExtensionManager extends PubSubService {
 
     if (!extensionId) {
       // Note: Mode framework cannot function without IDs.
-      log.warn(extension);
+      this.logger.warn(extension);
       throw new Error(`Extension ID not set`);
     }
 
     if (this.registeredExtensionIds.includes(extensionId)) {
-      log.warn(
+      this.logger.warn(
         `Extension ID ${extensionId} has already been registered. Exiting before duplicating modules.`
       );
       return;
@@ -434,7 +441,7 @@ export default class ExtensionManager extends PubSubService {
       });
 
       if (!extensionModule) {
-        log.warn(
+        this.logger.warn(
           `Null or undefined returned when registering the ${getModuleFnName} module for the ${extensionId} extension`
         );
       }
@@ -586,7 +593,7 @@ export default class ExtensionManager extends PubSubService {
   _initCommandsModule = extensionModule => {
     let { definitions, defaultContext } = extensionModule;
     if (!definitions || Object.keys(definitions).length === 0) {
-      log.warn('Commands Module contains no command definitions');
+      this.logger.warn('Commands Module contains no command definitions');
       return;
     }
 

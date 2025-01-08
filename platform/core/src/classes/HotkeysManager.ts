@@ -1,6 +1,6 @@
-import objectHash from 'object-hash';
-import { hotkeys } from '../utils';
 import isequal from 'lodash.isequal';
+import objectHash from 'object-hash';
+import { hotkeys, Logger } from '../utils';
 import Hotkey from './Hotkey';
 
 /**
@@ -14,9 +14,15 @@ import Hotkey from './Hotkey';
  */
 
 export class HotkeysManager {
+  public logger: Logger;
+
   private _servicesManager: AppTypes.ServicesManager;
 
   constructor(commandsManager, servicesManager: AppTypes.ServicesManager) {
+    this.logger = new Logger();
+    this.logger.addPrefix('HotkeysManager');
+    this.logger.debug('initializing');
+
     this.hotkeyDefinitions = {};
     this.hotkeyDefaults = [];
     this.isEnabled = true;
@@ -186,9 +192,9 @@ export class HotkeysManager {
     if (previouslyRegisteredDefinition) {
       const previouslyRegisteredKeys = previouslyRegisteredDefinition.keys;
       this._unbindHotkeys(commandName, previouslyRegisteredKeys);
-      // log.info(
-      //   `[hotkeys] Unbinding ${commandName} with ${options} options from ${previouslyRegisteredKeys}`
-      // );
+      this.logger.debug(
+        `[hotkeys] Unbinding ${commandName} with ${options} options from ${previouslyRegisteredKeys}`
+      );
     }
 
     // Set definition & bind
@@ -200,10 +206,11 @@ export class HotkeysManager {
       isEditable,
     };
     this._bindHotkeys(commandName, commandOptions, context, keys);
-    // log.info(
-    //   `[hotkeys] Binding ${commandName} with ${options} from ${context ||
-    //   'default'} options to ${keys}`
-    // );
+    this.logger.debug(
+      `[hotkeys] Binding ${commandName} with ${options} from ${
+        context || 'default'
+      } options to ${keys}`
+    );
   }
 
   /**

@@ -1,11 +1,19 @@
 import MeasurementService from './MeasurementService';
-import log from '../../log';
 
-jest.mock('../../log', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+const mockWarn = jest.fn(() => {});
+
+jest.mock('../../utils/logger', () => {
+  return {
+    Logger: jest.fn().mockImplementation(() => {
+      return {
+        debug: jest.fn(),
+        warn: mockWarn,
+        info: jest.fn(),
+        addPrefix: jest.fn(),
+      };
+    }),
+  };
+});
 
 describe('MeasurementService.js', () => {
   const unmappedMeasurementUID = 'unmappedMeasurementUId';
@@ -77,7 +85,7 @@ describe('MeasurementService.js', () => {
       valueType: measurementService.VALUE_TYPES.POLYLINE,
       points: 2,
     };
-    log.warn.mockClear();
+    mockWarn.mockClear();
     jest.clearAllMocks();
   });
 

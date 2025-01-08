@@ -1,26 +1,26 @@
 import {
-  CommandsManager,
-  ExtensionManager,
-  ServicesManager,
-  ServiceProvidersManager,
-  HotkeysManager,
-  UINotificationService,
-  UIModalService,
-  UIDialogService,
-  UIViewportDialogService,
-  MeasurementService,
-  DisplaySetService,
-  ToolbarService,
-  ViewportGridService,
-  HangingProtocolService,
   CineService,
-  UserAuthenticationService,
-  errorHandler,
+  CommandsManager,
   CustomizationService,
+  DisplaySetService,
+  errorHandler,
+  ExtensionManager,
+  HangingProtocolService,
+  HotkeysManager,
+  MeasurementService,
   PanelService,
-  WorkflowStepsService,
+  ServiceProvidersManager,
+  ServicesManager,
   StudyPrefetcherService,
-  // utils,
+  ToolbarService,
+  UIDialogService,
+  UIModalService,
+  UINotificationService,
+  UIViewportDialogService,
+  UserAuthenticationService,
+  utils,
+  ViewportGridService,
+  WorkflowStepsService,
 } from '@ohif/core';
 
 import loadModules, { loadModule as peerImport } from './pluginImports';
@@ -30,20 +30,25 @@ import loadModules, { loadModule as peerImport } from './pluginImports';
  * @param {object[]} defaultExtensions - array of extension objects
  */
 async function appInit(appConfigOrFunc, defaultExtensions, defaultModes) {
-  const commandsManagerConfig = {
-    getAppState: () => {},
-  };
+  const isAppConfigFunc = typeof appConfigOrFunc === 'function';
+  if (!isAppConfigFunc) {
+    // safe to set log levels here, as it's not a function
+    utils.Logger.setMethods(appConfigOrFunc.logLevels);
+  }
 
-  const commandsManager = new CommandsManager(commandsManagerConfig);
+  const commandsManager = new CommandsManager();
   const servicesManager = new ServicesManager(commandsManager);
   const serviceProvidersManager = new ServiceProvidersManager();
   const hotkeysManager = new HotkeysManager(commandsManager, servicesManager);
 
-  const appConfig = {
-    ...(typeof appConfigOrFunc === 'function'
-      ? await appConfigOrFunc({ servicesManager, peerImport })
-      : appConfigOrFunc),
-  };
+  const appConfig = isAppConfigFunc
+    ? await appConfigOrFunc({ servicesManager, peerImport })
+    : appConfigOrFunc;
+
+  if (isAppConfigFunc) {
+    utils.Logger.setMethods(appConfig.logLevels);
+  }
+
   // Default the peer import function
   appConfig.peerImport ||= peerImport;
 

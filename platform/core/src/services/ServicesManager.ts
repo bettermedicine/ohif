@@ -1,16 +1,20 @@
-import log from './../log.js';
 import CommandsManager from '../classes/CommandsManager';
 import ExtensionManager from '../extensions/ExtensionManager';
+import { Logger } from '../utils';
 
 export default class ServicesManager {
   public services: AppTypes.Services = {};
   public registeredServiceNames: string[] = [];
+  public logger: Logger;
   private _commandsManager: CommandsManager;
   private _extensionManager: ExtensionManager;
 
   constructor(commandsManager: CommandsManager) {
     this._commandsManager = commandsManager;
     this._extensionManager = null;
+    this.logger = new Logger();
+    this.logger.addPrefix('ServicesManager');
+    this.logger.debug('initializing');
     this.services = {};
     this.registeredServiceNames = [];
   }
@@ -27,17 +31,17 @@ export default class ServicesManager {
    */
   registerService(service, configuration = {}) {
     if (!service) {
-      log.warn('Attempting to register a null/undefined service. Exiting early.');
+      this.logger.warn('Attempting to register a null/undefined service. Exiting early.');
       return;
     }
 
     if (!service.name) {
-      log.warn(`Service name not set. Exiting early.`);
+      this.logger.warn(`Service name not set. Exiting early.`);
       return;
     }
 
     if (this.registeredServiceNames.includes(service.name)) {
-      log.warn(
+      this.logger.warn(
         `Service name ${service.name} has already been registered. Exiting before duplicating services.`
       );
       return;
@@ -56,9 +60,11 @@ export default class ServicesManager {
         this.services[service.altName] = this.services[service.name];
       }
     } else {
-      log.warn(`Service create factory function not defined. Exiting early.`);
+      this.logger.warn(`Service create factory function not defined. Exiting early.`);
       return;
     }
+
+    this.logger.debug(`Service ${service.name} registered`);
 
     /* Track service registration */
     this.registeredServiceNames.push(service.name);

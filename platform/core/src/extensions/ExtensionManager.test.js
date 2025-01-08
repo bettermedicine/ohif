@@ -1,8 +1,19 @@
 import ExtensionManager from './ExtensionManager';
 import MODULE_TYPES from './MODULE_TYPES';
-import log from './../log.js';
 
-jest.mock('./../log.js');
+const mockWarn = jest.fn(() => {});
+
+jest.mock('../utils', () => {
+  return {
+    Logger: jest.fn().mockImplementation(() => {
+      return {
+        debug: jest.fn(),
+        warn: mockWarn,
+        addPrefix: jest.fn(),
+      };
+    }),
+  };
+});
 
 describe('ExtensionManager.ts', () => {
   let extensionManager, commandsManager, servicesManager, appConfig;
@@ -31,7 +42,7 @@ describe('ExtensionManager.ts', () => {
       commandsManager,
       appConfig,
     });
-    log.warn.mockClear();
+    mockWarn.mockClear();
     jest.clearAllMocks();
   });
 
@@ -132,7 +143,7 @@ describe('ExtensionManager.ts', () => {
       // SUT
       extensionManager.registerExtension(extension);
 
-      expect(log.warn.mock.calls.length).toBe(1);
+      expect(mockWarn).toHaveBeenCalledTimes(1);
     });
 
     it('logs a warning if a defined module returns null or undefined', () => {
@@ -145,8 +156,10 @@ describe('ExtensionManager.ts', () => {
 
       extensionManager.registerExtension(extensionWithBadModule);
 
-      expect(log.warn.mock.calls.length).toBe(1);
-      expect(log.warn.mock.calls[0][0]).toContain('Null or undefined returned when registering');
+      expect(mockWarn).toHaveBeenCalledTimes(1);
+      expect(mockWarn).toHaveBeenCalledWith(
+        'Null or undefined returned when registering the getViewportModule module for the hello-world extension'
+      );
     });
 
     it('logs an error if an exception is thrown while retrieving a module', async () => {
@@ -271,10 +284,8 @@ describe('ExtensionManager.ts', () => {
       // SUT
       extensionManager.registerExtension(extension);
 
-      expect(log.warn.mock.calls.length).toBe(1);
-      expect(log.warn.mock.calls[0][0]).toContain(
-        'Commands Module contains no command definitions'
-      );
+      expect(mockWarn).toHaveBeenCalledTimes(1);
+      expect(mockWarn).toHaveBeenCalledWith('Commands Module contains no command definitions');
     });
   });
 });

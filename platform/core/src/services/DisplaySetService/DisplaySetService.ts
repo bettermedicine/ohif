@@ -1,5 +1,6 @@
 import { ExtensionManager } from '../../extensions';
 import { DisplaySet, InstanceMetadata } from '../../types';
+import { Logger } from '../../utils';
 import { PubSubService } from '../_shared/pubSubServiceInterface';
 import EVENTS from './EVENTS';
 
@@ -35,6 +36,7 @@ export default class DisplaySetService extends PubSubService {
     },
   };
 
+  public logger: Logger;
   public activeDisplaySets = [];
   public unsupportedSOPClassHandler;
   extensionManager: ExtensionManager;
@@ -47,6 +49,11 @@ export default class DisplaySetService extends PubSubService {
 
   constructor() {
     super(EVENTS);
+
+    this.logger = new Logger();
+    this.logger.addPrefix('DisplaySetService');
+    this.logger.debug('initializing');
+
     this.unsupportedSOPClassHandler =
       '@ohif/extension-default.sopClassHandlerModule.not-supported-display-sets-handler';
   }

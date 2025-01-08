@@ -1,44 +1,45 @@
-import ObjectPath from './objectPath';
 import absoluteUrl from './absoluteUrl';
-import guid from './guid';
-import uuidv4 from './uuidv4';
-import sortBy from './sortBy.js';
-import writeScript from './writeScript.js';
+import addAccessors from './addAccessors';
 import b64toBlob from './b64toBlob.js';
+import { createStudyBrowserTabs } from './createStudyBrowserTabs';
+import debounce from './debounce';
+import downloadCSVReport from './downloadCSVReport';
+import formatDate from './formatDate';
+import formatPN from './formatPN';
+import formatTime from './formatTime';
+import generateAcceptHeader from './generateAcceptHeader';
+import guid from './guid';
+import hierarchicalListUtils from './hierarchicalListUtils';
+import hotkeys from './hotkeys';
+import imageIdToURI from './imageIdToURI';
+import isDicomUid from './isDicomUid';
+import isDisplaySetReconstructable from './isDisplaySetReconstructable';
+import isEqualWithin from './isEqualWithin';
+import { isImage } from './isImage';
+import isLowPriorityModality from './isLowPriorityModality';
+import { Logger, logger } from './logger';
+import makeCancelable from './makeCancelable';
+import makeDeferred from './makeDeferred';
+import ObjectPath from './objectPath';
+import progressTrackingUtils from './progressTrackingUtils';
+import Queue from './Queue';
+import resolveObjectPath from './resolveObjectPath';
+import roundNumber from './roundNumber';
+import { sopClassDictionary } from './sopClassDictionary';
+import sortBy from './sortBy.js';
+import sortInstancesByPosition from './sortInstancesByPosition';
+import {
+  seriesSortCriteria,
+  sortingCriteria,
+  sortStudy,
+  sortStudyInstances,
+  sortStudySeries,
+} from './sortStudy';
+import { getSplitParam, splitComma } from './splitComma';
 //import loadAndCacheDerivedDisplaySets from './loadAndCacheDerivedDisplaySets.js';
 import urlUtil from './urlUtil';
-import makeDeferred from './makeDeferred';
-import makeCancelable from './makeCancelable';
-import hotkeys from './hotkeys';
-import Queue from './Queue';
-import isDicomUid from './isDicomUid';
-import formatDate from './formatDate';
-import formatTime from './formatTime';
-import formatPN from './formatPN';
-import generateAcceptHeader from './generateAcceptHeader';
-import resolveObjectPath from './resolveObjectPath';
-import hierarchicalListUtils from './hierarchicalListUtils';
-import progressTrackingUtils from './progressTrackingUtils';
-import isLowPriorityModality from './isLowPriorityModality';
-import { isImage } from './isImage';
-import isDisplaySetReconstructable from './isDisplaySetReconstructable';
-import sortInstancesByPosition from './sortInstancesByPosition';
-import imageIdToURI from './imageIdToURI';
-import debounce from './debounce';
-import roundNumber from './roundNumber';
-import downloadCSVReport from './downloadCSVReport';
-import isEqualWithin from './isEqualWithin';
-import addAccessors from './addAccessors';
-import {
-  sortStudy,
-  sortStudySeries,
-  sortStudyInstances,
-  sortingCriteria,
-  seriesSortCriteria,
-} from './sortStudy';
-import { splitComma, getSplitParam } from './splitComma';
-import { createStudyBrowserTabs } from './createStudyBrowserTabs';
-import { sopClassDictionary } from './sopClassDictionary';
+import uuidv4 from './uuidv4';
+import writeScript from './writeScript.js';
 
 // Commented out unused functionality.
 // Need to implement new mechanism for derived displaySets using the displaySetManager.
@@ -84,6 +85,8 @@ const utils = {
   getSplitParam,
   generateAcceptHeader,
   createStudyBrowserTabs,
+  logger,
+  Logger,
 };
 
 export {
@@ -117,6 +120,8 @@ export {
   getSplitParam,
   generateAcceptHeader,
   createStudyBrowserTabs,
+  logger,
+  Logger,
 };
 
 export default utils;

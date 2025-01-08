@@ -1,7 +1,18 @@
 import ServicesManager from './ServicesManager';
-import log from '../log';
 
-jest.mock('./../log');
+const mockWarn = jest.fn(() => {});
+
+jest.mock('../utils/logger', () => {
+  return {
+    Logger: jest.fn().mockImplementation(() => {
+      return {
+        debug: jest.fn(),
+        warn: mockWarn,
+        addPrefix: jest.fn(),
+      };
+    }),
+  };
+});
 
 describe('ServicesManager', () => {
   let servicesManager, commandsManager;
@@ -13,7 +24,7 @@ describe('ServicesManager', () => {
       registerCommand: jest.fn(),
     };
     servicesManager = new ServicesManager(commandsManager);
-    log.warn.mockClear();
+    mockWarn.mockClear();
     jest.clearAllMocks();
   });
 
@@ -52,7 +63,7 @@ describe('ServicesManager', () => {
       servicesManager.registerService(undefinedService);
       servicesManager.registerService(nullService);
 
-      expect(log.warn.mock.calls.length).toBe(2);
+      expect(mockWarn).toHaveBeenCalledTimes(2);
     });
 
     it('logs a warning if the service does not have a name', () => {
@@ -62,7 +73,7 @@ describe('ServicesManager', () => {
       servicesManager.registerService(serviceWithEmptyName);
       servicesManager.registerService(serviceWithoutName);
 
-      expect(log.warn.mock.calls.length).toBe(2);
+      expect(mockWarn).toHaveBeenCalledTimes(2);
     });
 
     it('logs a warning if the service does not have a create factory function', () => {
@@ -70,7 +81,7 @@ describe('ServicesManager', () => {
 
       servicesManager.registerService(serviceWithoutCreate);
 
-      expect(log.warn.mock.calls.length).toBe(1);
+      expect(mockWarn).toHaveBeenCalledTimes(1);
     });
 
     it('tracks which services have been registered', () => {
@@ -83,7 +94,7 @@ describe('ServicesManager', () => {
       servicesManager.registerService(fakeService);
       servicesManager.registerService(fakeService);
 
-      expect(log.warn.mock.calls.length).toBe(1);
+      expect(mockWarn).toHaveBeenCalledTimes(1);
     });
 
     it('pass dependencies and configuration to service create factory function', () => {

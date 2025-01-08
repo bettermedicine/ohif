@@ -1,12 +1,24 @@
 import CommandsManager from './CommandsManager';
 import HotkeysManager from './HotkeysManager';
 import hotkeys from './../utils/hotkeys';
-import log from './../log';
 import objectHash from 'object-hash';
 
 jest.mock('./CommandsManager');
 jest.mock('./../utils/hotkeys');
-jest.mock('./../log');
+
+const mockWarn = jest.fn(() => {});
+
+jest.mock('../utils/logger', () => {
+  return {
+    Logger: jest.fn().mockImplementation(() => {
+      return {
+        debug: jest.fn(),
+        warn: mockWarn,
+        addPrefix: jest.fn(),
+      };
+    }),
+  };
+});
 
 describe('HotkeysManager', () => {
   let hotkeysManager, commandsManager;
@@ -16,7 +28,7 @@ describe('HotkeysManager', () => {
     hotkeysManager = new HotkeysManager(commandsManager);
     CommandsManager.mockClear();
     hotkeys.mockClear();
-    log.warn.mockClear();
+    mockWarn.mockClear();
     jest.clearAllMocks();
   });
   it('has expected properties', () => {

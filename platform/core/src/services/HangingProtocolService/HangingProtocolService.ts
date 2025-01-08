@@ -1,16 +1,17 @@
 import cloneDeep from 'lodash.clonedeep';
-
-import { PubSubService } from '../_shared/pubSubServiceInterface';
-import sortBy from '../../utils/sortBy';
-import ProtocolEngine from './ProtocolEngine';
-import { StudyMetadata } from '../../types/StudyMetadata';
-import DisplaySet from '../DisplaySetService/DisplaySet';
 import { CommandsManager } from '../../classes';
 import * as HangingProtocol from '../../types/HangingProtocol';
+import { StudyMetadata } from '../../types/StudyMetadata';
+import { Logger } from '../../utils';
+import sortBy from '../../utils/sortBy';
+import uuidv4 from '../../utils/uuidv4';
+
+import { PubSubService } from '../_shared/pubSubServiceInterface';
+import DisplaySet from '../DisplaySetService/DisplaySet';
 import { isDisplaySetFromUrl, sopInstanceLocation } from './custom-attribute/isDisplaySetFromUrl';
 import numberOfDisplaySetsWithImages from './custom-attribute/numberOfDisplaySetsWithImages';
 import seriesDescriptionsFromDisplaySets from './custom-attribute/seriesDescriptionsFromDisplaySets';
-import uuidv4 from '../../utils/uuidv4';
+import ProtocolEngine from './ProtocolEngine';
 
 type Protocol = HangingProtocol.Protocol | HangingProtocol.ProtocolGenerator;
 
@@ -43,6 +44,8 @@ export default class HangingProtocolService extends PubSubService {
       return new HangingProtocolService(commandsManager, servicesManager);
     },
   };
+
+  public logger: Logger;
 
   studies: StudyMetadata[];
   // stores all the protocols (object or function that returns an object) in a map
@@ -143,6 +146,10 @@ export default class HangingProtocolService extends PubSubService {
     this.protocolEngine = undefined;
     this.protocol = undefined;
     this.stageIndex = undefined;
+
+    this.logger = new Logger();
+    this.logger.addPrefix('HangingProtocolService');
+    this.logger.debug('initializing');
 
     this.studies = [];
   }
@@ -303,7 +310,7 @@ export default class HangingProtocolService extends PubSubService {
 
         return generatedProtocol;
       } catch (error) {
-        console.warn(
+        this.logger.warn(
           `Error while executing protocol generator for protocol ${protocolId}: ${error}`
         );
       }
@@ -323,7 +330,7 @@ export default class HangingProtocolService extends PubSubService {
    */
   public addProtocol(protocolId: string, protocol: Protocol): void {
     if (this.protocols.has(protocolId)) {
-      console.warn(`A protocol with id ${protocolId} already exists. It will be overwritten.`);
+      this.logger.warn(`A protocol with id ${protocolId} already exists. It will be overwritten.`);
     }
 
     if (!(protocol instanceof Function)) {
@@ -355,7 +362,7 @@ export default class HangingProtocolService extends PubSubService {
   public setActiveProtocolIds(protocolId?: string[] | string): void {
     if (!protocolId || !protocolId.length) {
       this.activeProtocolIds = null;
-      console.log('No active protocols, setting all to active');
+      this.logger.log('No active protocols, setting all to active');
       return;
     }
     if (typeof protocolId === 'string') {
@@ -501,7 +508,7 @@ export default class HangingProtocolService extends PubSubService {
     // if loader successfully re-arranged the data with the custom strategy
     // and returned the new props, then broadcast them
     if (!loadedData) {
-      console.warn('Not able to load data with custom strategy');
+      this.logger.warn('Not able to load data with custom strategy');
       return false;
     }
 
@@ -516,7 +523,7 @@ export default class HangingProtocolService extends PubSubService {
     const { stages } = protocol;
 
     if (!stages) {
-      console.warn('Protocol has not stages:', protocol.id, protocol);
+      this.logger.warn('Protocol has not stages:', protocol.id, protocol);
       return;
     }
 
@@ -525,7 +532,7 @@ export default class HangingProtocolService extends PubSubService {
       selector.id = id;
       const { seriesMatchingRules } = selector;
       if (!seriesMatchingRules) {
-        console.warn('Selector has no series matching rules', protocol.id, id);
+        this.logger.warn('Selector has no series matching rules', protocol.id, id);
         return;
       }
     }
@@ -869,7 +876,7 @@ export default class HangingProtocolService extends PubSubService {
     const foundProtocol = this.protocols.get(protocolId);
 
     if (!foundProtocol) {
-      console.warn(
+      this.logger.warn(
         `ProtocolEngine::setProtocol - Protocol with id ${protocolId} not found - you should register it first via addProtocol`
       );
       return;
@@ -884,7 +891,7 @@ export default class HangingProtocolService extends PubSubService {
 
       this._setProtocol(protocol, options);
     } catch (error) {
-      console.log(error);
+      this.logger.log(error);
 
       if (errorCallback) {
         errorCallback(error);
@@ -907,7 +914,7 @@ export default class HangingProtocolService extends PubSubService {
     for (const dsName of displaySetSelectorsMatched) {
       const displaySetSelector = displaySetSelectors[dsName];
       if (!displaySetSelector) {
-        console.warn('No display set selector for', dsName);
+        this.logger.warn('No display set selector for', dsName);
         return false;
       }
       const { bestMatch } = this._matchImages(displaySetSelector);
@@ -1031,7 +1038,7 @@ export default class HangingProtocolService extends PubSubService {
       this.stageIndex = stage as number;
       this._updateViewports(options);
     } catch (error) {
-      console.log(error);
+      this.logger.log(error);
       Object.assign(this, old);
       throw new Error(error);
     }
@@ -1103,7 +1110,7 @@ export default class HangingProtocolService extends PubSubService {
     options
   ): HangingProtocol.ViewportMatchDetails {
     if (this.protocol.id !== protocolId) {
-      console.warn('setting protocol');
+      this.logger.warn('setting protocol');
       this.protocol = this.getProtocolById(protocolId);
       this.stageIndex = 0;
     }
@@ -1157,7 +1164,7 @@ export default class HangingProtocolService extends PubSubService {
       !stageModel.viewports ||
       !stageModel.viewports.length
     ) {
-      console.log('Stage cannot be applied', stageModel);
+      this.logger.log('Stage cannot be applied', stageModel);
       return;
     }
 
@@ -1166,7 +1173,7 @@ export default class HangingProtocolService extends PubSubService {
     // If no such layout properties exist, stop here.
     const layoutProps = stageModel.viewportStructure.properties;
     if (!layoutProps) {
-      console.log('No viewportStructure.properties in', stageModel);
+      this.logger.log('No viewportStructure.properties in', stageModel);
       return;
     }
 
@@ -1216,7 +1223,7 @@ export default class HangingProtocolService extends PubSubService {
         ) {
           matchedViewports++;
         } else {
-          console.log('Adding an empty set of display sets for mapping purposes');
+          this.logger.log('Adding an empty set of display sets for mapping purposes');
           matchDetails.displaySetsInfo = viewport.displaySets.map(it => ({
             displaySetOptions: it,
           }));
@@ -1300,7 +1307,7 @@ export default class HangingProtocolService extends PubSubService {
       const displaySetSelector = displaySetSelectors[displaySetId];
 
       if (!displaySetSelector) {
-        console.warn('No display set selector for', displaySetId);
+        this.logger.warn('No display set selector for', displaySetId);
         continue;
       }
       const { bestMatch, matchingScores } = this._matchImages(displaySetSelector);
@@ -1355,7 +1362,7 @@ export default class HangingProtocolService extends PubSubService {
 
         displaySetsInfo.push(displaySetInfo);
       } else {
-        console.warn(
+        this.logger.warn(
           `
              The hanging protocol viewport is requesting to display ${id} displaySet that is not
              matched based on the provided criteria (e.g. matching rules).
@@ -1465,7 +1472,7 @@ export default class HangingProtocolService extends PubSubService {
     const matchingScores = [];
     let highestSeriesMatchingScore = 0;
 
-    console.log('ProtocolEngine::matchImages', studyMatchingRules, seriesMatchingRules);
+    this.logger.log('ProtocolEngine::matchImages', studyMatchingRules, seriesMatchingRules);
     const matchActiveOnly = this.protocol.numberOfPriorsReferenced === -1;
     this.studies.forEach((study, studyInstanceUIDsIndex) => {
       // Skip non-active if active only
@@ -1546,7 +1553,7 @@ export default class HangingProtocolService extends PubSubService {
     });
 
     if (matchingScores.length === 0) {
-      console.log('No match found', id);
+      this.logger.log('No match found', id);
     }
 
     // Sort the matchingScores
@@ -1565,7 +1572,7 @@ export default class HangingProtocolService extends PubSubService {
 
     const bestMatch = matchingScores[0];
 
-    console.log('ProtocolEngine::matchImages bestMatch', bestMatch, matchingScores);
+    this.logger.log('ProtocolEngine::matchImages bestMatch', bestMatch, matchingScores);
 
     return {
       bestMatch,
@@ -1657,7 +1664,7 @@ export default class HangingProtocolService extends PubSubService {
    */
   debug(...args): void {
     if (this.debugLogging) {
-      console.log(...args);
+      this.logger.log(...args);
     }
   }
 

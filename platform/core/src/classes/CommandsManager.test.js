@@ -1,7 +1,18 @@
 import CommandsManager from './CommandsManager';
-import log from './../log.js';
 
-jest.mock('./../log.js');
+const mockWarn = jest.fn(() => {});
+
+jest.mock('../utils', () => {
+  return {
+    Logger: jest.fn().mockImplementation(() => {
+      return {
+        debug: jest.fn(),
+        warn: mockWarn,
+        addPrefix: jest.fn(),
+      };
+    }),
+  };
+});
 
 describe('CommandsManager', () => {
   let commandsManager,
@@ -130,7 +141,7 @@ describe('CommandsManager', () => {
       const result = commandsManager.runCommand('CommandThatDoesNotExistInAnyContext');
 
       expect(result).toBe(undefined);
-      expect(log.warn.mock.calls[0][0]).toEqual(
+      expect(mockWarn).toHaveBeenCalledWith(
         'Command "CommandThatDoesNotExistInAnyContext" not found in current context'
       );
     });
@@ -146,9 +157,7 @@ describe('CommandsManager', () => {
       const result = commandsManager.runCommand('TestCommand', null, contextName);
 
       expect(result).toBe(undefined);
-      expect(log.warn.mock.calls[0][0]).toEqual(
-        'No commandFn was defined for command "TestCommand"'
-      );
+      expect(mockWarn).toHaveBeenCalledWith('No commandFn was defined for command "TestCommand"');
     });
 
     it('Calls commandFn', () => {

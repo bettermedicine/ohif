@@ -1,28 +1,31 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import HangingProtocolServiceType from '../services/HangingProtocolService';
-import CustomizationServiceType from '../services/CustomizationService';
-import MeasurementServiceType from '../services/MeasurementService';
-import ViewportGridServiceType from '../services/ViewportGridService';
-import ToolbarServiceType from '../services/ToolBarService';
-import DisplaySetServiceType from '../services/DisplaySetService';
-import UINotificationServiceType from '../services/UINotificationService';
-import UIModalServiceType from '../services/UIModalService';
-import WorkflowStepsServiceType from '../services/WorkflowStepsService';
-import CineServiceType from '../services/CineService';
-import UserAuthenticationServiceType from '../services/UserAuthenticationService';
-import PanelServiceType from '../services/PanelService';
-import UIDialogServiceType from '../services/UIDialogService';
-import UIViewportDialogServiceType from '../services/UIViewportDialogService';
-import StudyPrefetcherServiceType from '../services/StudyPrefetcherService';
+import { StepOptions, TourOptions } from 'shepherd.js';
 
-import ServicesManagerType from '../services/ServicesManager';
 import CommandsManagerType from '../classes/CommandsManager';
-import ExtensionManagerType from '../extensions/ExtensionManager';
-
 import Hotkey from '../classes/Hotkey';
 
-import * as CommandTypes from './Command';
+import ExtensionManagerType from '../extensions/ExtensionManager';
+
+import CineServiceType from '../services/CineService';
+import CustomizationServiceType from '../services/CustomizationService';
+import DisplaySetServiceType from '../services/DisplaySetService';
+import HangingProtocolServiceType from '../services/HangingProtocolService';
+import MeasurementServiceType from '../services/MeasurementService';
+import PanelServiceType from '../services/PanelService';
+import ServicesManagerType from '../services/ServicesManager';
+import StudyPrefetcherServiceType from '../services/StudyPrefetcherService';
+import ToolbarServiceType from '../services/ToolBarService';
+import UIDialogServiceType from '../services/UIDialogService';
+import UIModalServiceType from '../services/UIModalService';
+import UINotificationServiceType from '../services/UINotificationService';
+import UIViewportDialogServiceType from '../services/UIViewportDialogService';
+import UserAuthenticationServiceType from '../services/UserAuthenticationService';
+import ViewportGridServiceType from '../services/ViewportGridService';
+import WorkflowStepsServiceType from '../services/WorkflowStepsService';
+
 import * as ColorTypes from './Color';
+import * as CommandTypes from './Command';
+import { TConsoleMethod } from './ConsoleMethod';
 import * as ConsumerTypes from './Consumer';
 import * as DataSourceTypes from './DataSource';
 import * as DataSourceConfigurationAPITypes from './DataSourceConfigurationAPI';
@@ -32,8 +35,6 @@ import * as IPubSubTypes from './IPubSub';
 import * as PanelModuleTypes from './PanelModule';
 import * as StudyMetadataTypes from './StudyMetadata';
 import * as ViewportGridTypes from './ViewportGridType';
-
-import { StepOptions, TourOptions } from 'shepherd.js';
 
 declare global {
   namespace AppTypes {
@@ -86,6 +87,7 @@ declare global {
       customizationService?: CustomizationServiceType;
       extensions?: string[];
       modes?: string[];
+      logLevels?: TConsoleMethod[];
       experimentalStudyBrowserSort?: boolean;
       defaultDataSourceName?: string;
       hotkeys?: Record<string, Hotkey> | Hotkey[];

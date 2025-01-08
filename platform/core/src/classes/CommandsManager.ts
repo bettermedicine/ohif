@@ -1,5 +1,5 @@
-import log from '../log.js';
-import { Command, Commands, ComplexCommand } from '../types/Command';
+import { Command, Commands, ComplexCommand } from '../types';
+import { Logger } from '../utils';
 
 /**
  * The definition of a command
@@ -19,12 +19,16 @@ import { Command, Commands, ComplexCommand } from '../types/Command';
  * to extend this class, please check it's source before adding new methods.
  */
 export class CommandsManager {
+  public logger: Logger;
+
   private contexts = {};
   // Has the reverse order in which contexts are created, used for the default ordering
   private contextOrder = new Array<string>();
 
-  constructor(_options = {}) {
-    // No-op
+  constructor() {
+    this.logger = new Logger();
+    this.logger.addPrefix('CommandsManager');
+    this.logger.debug('initializing');
   }
 
   /**
@@ -41,6 +45,8 @@ export class CommandsManager {
     if (!contextName) {
       return;
     }
+
+    this.logger.debug(`Creating context: ${contextName}`);
 
     if (this.contexts[contextName]) {
       return this.clearContext(contextName);
@@ -101,6 +107,8 @@ export class CommandsManager {
       return;
     }
 
+    this.logger.debug(`Registering command: ${commandName} in context: ${contextName}`);
+
     context[commandName] = definition;
   }
 
@@ -138,7 +146,7 @@ export class CommandsManager {
   public runCommand(commandName: string, options = {}, contextName?: string | string[]) {
     const definition = this.getCommand(commandName, contextName);
     if (!definition) {
-      log.warn(`Command "${commandName}" not found in current context`);
+      this.logger.warn(`Command "${commandName}" not found in current context`);
       return;
     }
 
@@ -150,7 +158,7 @@ export class CommandsManager {
     );
 
     if (typeof commandFn !== 'function') {
-      log.warn(`No commandFn was defined for command "${commandName}"`);
+      this.logger.warn(`No commandFn was defined for command "${commandName}"`);
       return;
     } else {
       return commandFn(commandParams);
@@ -192,7 +200,7 @@ export class CommandsManager {
     }
 
     if (commands.length === 0) {
-      console.log("Command isn't runnable", toRun);
+      this.logger.log("Command isn't runnable", toRun);
       return;
     }
 
@@ -213,7 +221,7 @@ export class CommandsManager {
         if (typeof command === 'function') {
           result = command();
         } else {
-          console.warn('No command name supplied in', toRun);
+          this.logger.warn('No command name supplied in', toRun);
         }
       }
     });

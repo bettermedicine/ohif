@@ -1,5 +1,19 @@
 import HangingProtocolService from './HangingProtocolService';
 
+jest.mock('../../utils/logger', () => {
+  return {
+    Logger: jest.fn().mockImplementation(() => {
+      return {
+        log: jest.fn(),
+        debug: jest.fn(),
+        warn: jest.fn(),
+        info: jest.fn(),
+        addPrefix: jest.fn(),
+      };
+    }),
+  };
+});
+
 const testProtocol = {
   id: 'test',
   name: 'Default',
