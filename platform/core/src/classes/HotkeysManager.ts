@@ -1,6 +1,6 @@
 import isequal from 'lodash.isequal';
 import objectHash from 'object-hash';
-import { hotkeys, Logger } from '../utils';
+import { defaultLogger, hotkeys, Logger } from '../utils';
 import Hotkey from './Hotkey';
 
 /**
@@ -19,8 +19,7 @@ export class HotkeysManager {
   private _servicesManager: AppTypes.ServicesManager;
 
   constructor(commandsManager, servicesManager: AppTypes.ServicesManager) {
-    this.logger = new Logger();
-    this.logger.addPrefix('HotkeysManager');
+    this.logger = defaultLogger.clone('HotkeysManager');
     this.logger.debug('initializing');
 
     this.hotkeyDefinitions = {};

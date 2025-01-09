@@ -1,6 +1,6 @@
 import { ExtensionManager } from '../../extensions';
 import { DisplaySet } from '../../types';
-import { Logger } from '../../utils';
+import { defaultLogger, Logger } from '../../utils';
 import { PubSubService } from '../_shared/pubSubServiceInterface';
 import ServicesManager from '../ServicesManager';
 import ViewportGridService from '../ViewportGridService';
@@ -162,8 +162,7 @@ class StudyPrefetcherService extends PubSubService {
   }) {
     super(EVENTS);
 
-    this.logger = new Logger();
-    this.logger.addPrefix('StudyPrefetcherService');
+    this.logger = defaultLogger.clone('StudyPrefetcherService');
     this.logger.debug('initializing');
 
     this._servicesManager = servicesManager;

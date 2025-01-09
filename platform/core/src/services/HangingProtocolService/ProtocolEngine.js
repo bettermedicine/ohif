@@ -1,6 +1,6 @@
 import { HPMatcher } from './HPMatcher.js';
 import { sortByScore } from './lib/sortByScore';
-import { Logger } from '../../utils';
+import { defaultLogger } from '../../utils';
 
 export default class ProtocolEngine {
   logger = null;
@@ -11,8 +11,7 @@ export default class ProtocolEngine {
     this.matchedProtocols = new Map();
     this.matchedProtocolScores = {};
 
-    this.logger = new Logger();
-    this.logger.addPrefix('ProtocolEngine');
+    this.logger = defaultLogger.clone('ProtocolEngine');
     this.logger.debug('initializing');
 
     this.study = undefined;

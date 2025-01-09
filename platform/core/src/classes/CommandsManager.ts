@@ -1,5 +1,5 @@
 import { Command, Commands, ComplexCommand } from '../types';
-import { Logger } from '../utils';
+import { defaultLogger, Logger } from '../utils';
 
 /**
  * The definition of a command
@@ -26,8 +26,7 @@ export class CommandsManager {
   private contextOrder = new Array<string>();
 
   constructor() {
-    this.logger = new Logger();
-    this.logger.addPrefix('CommandsManager');
+    this.logger = defaultLogger.clone('CommandsManager');
     this.logger.debug('initializing');
   }
 

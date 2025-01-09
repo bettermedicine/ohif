@@ -1,4 +1,4 @@
-import { Logger } from '../../utils';
+import { defaultLogger, Logger } from '../../utils';
 import guid from '../../utils/guid';
 import { PubSubService } from '../_shared/pubSubServiceInterface';
 
@@ -126,8 +126,7 @@ class MeasurementService extends PubSubService {
     this.sources = {};
     this.mappings = {};
 
-    this.logger = new Logger();
-    this.logger.addPrefix('MeasurementService');
+    this.logger = defaultLogger.clone('MeasurementService');
     this.logger.debug('initializing');
   }
 

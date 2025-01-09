@@ -32,8 +32,8 @@ import loadModules, { loadModule as peerImport } from './pluginImports';
 async function appInit(appConfigOrFunc, defaultExtensions, defaultModes) {
   const isAppConfigFunc = typeof appConfigOrFunc === 'function';
   if (!isAppConfigFunc) {
-    // safe to set log levels here, as it's not a function
-    utils.Logger.setMethods(appConfigOrFunc.logLevels);
+    // safe to set log levels here as the config is not a function
+    utils.Logger.setPrefixMethods('@ohif', appConfigOrFunc.logLevels);
   }
 
   const commandsManager = new CommandsManager();
@@ -46,7 +46,7 @@ async function appInit(appConfigOrFunc, defaultExtensions, defaultModes) {
     : appConfigOrFunc;
 
   if (isAppConfigFunc) {
-    utils.Logger.setMethods(appConfig.logLevels);
+    utils.Logger.setPrefixMethods('@ohif', appConfig.logLevels);
   }
 
   // Default the peer import function

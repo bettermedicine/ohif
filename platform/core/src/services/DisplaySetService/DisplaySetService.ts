@@ -1,6 +1,6 @@
 import { ExtensionManager } from '../../extensions';
 import { DisplaySet, InstanceMetadata } from '../../types';
-import { Logger } from '../../utils';
+import { defaultLogger, Logger } from '../../utils';
 import { PubSubService } from '../_shared/pubSubServiceInterface';
 import EVENTS from './EVENTS';
 
@@ -50,8 +50,7 @@ export default class DisplaySetService extends PubSubService {
   constructor() {
     super(EVENTS);
 
-    this.logger = new Logger();
-    this.logger.addPrefix('DisplaySetService');
+    this.logger = defaultLogger.clone('DisplaySetService');
     this.logger.debug('initializing');
 
     this.unsupportedSOPClassHandler =

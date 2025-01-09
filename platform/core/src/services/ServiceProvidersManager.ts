@@ -1,4 +1,4 @@
-import { Logger } from '../utils';
+import { defaultLogger, Logger } from '../utils';
 
 /**
  * The ServiceProvidersManager allows for a React context provider class to be registered
@@ -12,8 +12,7 @@ export default class ServiceProvidersManager {
 
   public constructor() {
     this.providers = {};
-    this.logger = new Logger();
-    this.logger.addPrefix('ServiceProvidersManager');
+    this.logger = defaultLogger.clone('ServiceProvidersManager');
     this.logger.debug('initializing');
   }
 

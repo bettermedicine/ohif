@@ -1,6 +1,6 @@
 import CommandsManager from '../classes/CommandsManager';
 import ExtensionManager from '../extensions/ExtensionManager';
-import { Logger } from '../utils';
+import { defaultLogger, Logger } from '../utils';
 
 export default class ServicesManager {
   public services: AppTypes.Services = {};
@@ -12,8 +12,7 @@ export default class ServicesManager {
   constructor(commandsManager: CommandsManager) {
     this._commandsManager = commandsManager;
     this._extensionManager = null;
-    this.logger = new Logger();
-    this.logger.addPrefix('ServicesManager');
+    this.logger = defaultLogger.clone('ServicesManager');
     this.logger.debug('initializing');
     this.services = {};
     this.registeredServiceNames = [];

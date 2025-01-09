@@ -17,7 +17,7 @@ import isDisplaySetReconstructable from './isDisplaySetReconstructable';
 import isEqualWithin from './isEqualWithin';
 import { isImage } from './isImage';
 import isLowPriorityModality from './isLowPriorityModality';
-import { Logger, logger } from './logger';
+import { defaultLogger, Logger } from './logger';
 import makeCancelable from './makeCancelable';
 import makeDeferred from './makeDeferred';
 import ObjectPath from './objectPath';
@@ -85,7 +85,7 @@ const utils = {
   getSplitParam,
   generateAcceptHeader,
   createStudyBrowserTabs,
-  logger,
+  defaultLogger,
   Logger,
 };
 
@@ -120,7 +120,7 @@ export {
   getSplitParam,
   generateAcceptHeader,
   createStudyBrowserTabs,
-  logger,
+  defaultLogger,
   Logger,
 };
 

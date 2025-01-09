@@ -2,7 +2,7 @@ import cloneDeep from 'lodash.clonedeep';
 import { CommandsManager } from '../../classes';
 import * as HangingProtocol from '../../types/HangingProtocol';
 import { StudyMetadata } from '../../types/StudyMetadata';
-import { Logger } from '../../utils';
+import { defaultLogger, Logger } from '../../utils';
 import sortBy from '../../utils/sortBy';
 import uuidv4 from '../../utils/uuidv4';
 
@@ -147,8 +147,7 @@ export default class HangingProtocolService extends PubSubService {
     this.protocol = undefined;
     this.stageIndex = undefined;
 
-    this.logger = new Logger();
-    this.logger.addPrefix('HangingProtocolService');
+    this.logger = defaultLogger.clone('HangingProtocolService');
     this.logger.debug('initializing');
 
     this.studies = [];

@@ -1,55 +1,70 @@
 import { TConsoleMethod } from '../types';
-import guid from './guid';
 
-const defaultPrefix = '@ohif';
+const defaultName = '@ohif';
 const defaultStyle = 'color: cyan; font-weight: bold;';
 const defaultMethods: TConsoleMethod[] = ['log', 'info', 'trace', 'warn', 'debug', 'error'];
 
-type TPrefixedLogger = {
-  instance: Logger;
-  prefix: string;
-};
-
 export class Logger {
-  // A map of guid: TPrefixedLogger
-  // we can use this to globally modify all instances,
-  // for example if we want to silence all loggers with a specific prefix
-  private static instances: Record<string, TPrefixedLogger> = {};
-  private static methods: TConsoleMethod[] = defaultMethods;
-
-  public readonly guid: string;
+  // A map of name: Logger
+  private static instances: Record<string, Logger> = {};
 
   private readonly style: string;
 
-  private prefix: string;
-  private silencedMethods: TConsoleMethod[] = [];
+  private name: string;
+  private methods: TConsoleMethod[] = defaultMethods;
 
-  // Create a new instance of Logger with supplied methods, prefix, and style,
-  // if not supplied the default prefix and style will be used.
-  // The prefix will be seen in the console before each log message, eg:
-  // @ohif: {message}
-  constructor(prefix: string = defaultPrefix, style: string = defaultStyle) {
-    this.prefix = prefix;
+  constructor(
+    name: string = defaultName,
+    style: string = defaultStyle,
+    methods: TConsoleMethod[] = defaultMethods
+  ) {
+    if (Logger.instances[name]) {
+      throw new Error(
+        `Logger with name ${name} already exists, 
+        please use a different name or clone the existing logger.`
+      );
+    }
+
+    this.name = name;
     this.style = style;
-    this.guid = guid();
+    this.setMethods(methods);
 
     Logger.registerInstance(this);
-
-    // enable passed methods and disable the rest
-    this.restore(...Logger.methods);
-  }
-
-  // Sets available methods for all instances
-  public static setMethods(methods: TConsoleMethod[] = defaultMethods) {
-    Logger.methods = methods;
   }
 
   // Register each instance by guid to contain the instance and its prefix
   private static registerInstance(instance: Logger) {
-    Logger.instances[instance.guid] = {
-      instance,
-      prefix: instance.getPrefix(),
-    };
+    Logger.instances[instance.getName()] = instance;
+  }
+
+  private static unregisterInstance(instance: Logger) {
+    delete Logger.instances[instance.getName()];
+  }
+
+  private static getInstance(name: string) {
+    const instance = Logger.getInstance(name);
+    if (!instance) {
+      throw new Error(`Logger with name ${name} does not exist.`);
+    }
+
+    return instance;
+  }
+
+  private static getInstancesByPrefix(prefix: string): Logger[] {
+    const filteredNames = Object.keys(Logger.instances).filter(name => name.startsWith(prefix));
+    return filteredNames.map(name => Logger.instances[name]);
+  }
+
+  public static cloneLogger(name: string, nameExtension: string) {
+    return Logger.getInstance(name).clone(nameExtension);
+  }
+
+  public static setLoggerMethods(name: string, methods: TConsoleMethod[]) {
+    Logger.getInstance(name).setMethods(methods);
+  }
+
+  public static setPrefixMethods(prefix: string, methods: TConsoleMethod[]) {
+    Logger.getInstancesByPrefix(prefix).forEach(instance => instance.setMethods(methods));
   }
 
   public log(...data: any[]) {}
@@ -59,58 +74,57 @@ export class Logger {
   public debug(...data: any[]) {}
   public error(...data: any[]) {}
 
-  // Silence logger methods, if no methods are provided, silence all methods
-  public silence(...methods: TConsoleMethod[]) {
-    this.silencedMethods = methods;
-
-    methods.length
-      ? // silence only the supplied methods
-        methods.forEach(method => (this[method] = () => {}))
-      : // by default (no args), silence all methods
-        Logger.methods.forEach(method => (this[method] = () => {}));
-  }
-
-  // Restore silenced methods, if no methods are provided, restore all methods
-  public restore(...methods: TConsoleMethod[]) {
-    if (methods.length) {
-      this.silencedMethods = this.silencedMethods.filter(silenced => !methods.includes(silenced));
-      methods.forEach(method => {
-        this[method] = console[method].bind(console, `%c${this.prefix}`, this.style);
-      });
-
-      return;
-    }
-
-    // by default (no args), restore all possible methods
-    this.silencedMethods = [];
-    Logger.methods.forEach(method => {
-      this[method] = console[method].bind(console, `%c${this.prefix}`, this.style);
-    });
-  }
-
-  // Retrieve all active methods for this logger
-  public activeMethods(): TConsoleMethod[] {
-    return Logger.methods.filter(method => !this.silencedMethods.includes(method));
-  }
-
   // Get the current prefix
-  public getPrefix() {
-    return this.prefix;
+  public getName() {
+    return this.name;
   }
 
   // Set a new prefix
-  public setPrefix(prefix: string) {
-    this.prefix = prefix;
-    // since this logger has a new prefix, we need to register it again
+  public setName(name: string) {
+    Logger.unregisterInstance(this);
+    this.name = name;
     Logger.registerInstance(this);
-    this.restore(...this.activeMethods());
   }
 
-  // Add a prefix to the current prefix, separated by a slash
-  public addPrefix(addPrefix: string) {
-    this.setPrefix(`${this.prefix}/${addPrefix}`);
+  public getMethods() {
+    return this.methods;
+  }
+
+  public setMethods(methods: TConsoleMethod[]) {
+    this.methods = methods;
+
+    // Restore the methods with the new methods
+    methods.forEach(method => {
+      this[method] = console[method].bind(console, `%c${this.name}`, this.style);
+    });
+
+    // Silence the methods that are not in the new methods
+    defaultMethods.forEach(method => {
+      if (!methods.includes(method)) {
+        this[method] = () => {};
+      }
+    });
+  }
+
+  public silence(...methods: TConsoleMethod[]) {
+    const toSilence = methods.length ? methods : defaultMethods;
+    // Silence the methods that are not already silenced
+    this.setMethods(this.methods.filter(method => !toSilence.includes(method)));
+  }
+
+  public restore(...methods: TConsoleMethod[]) {
+    const toRestore = methods.length ? methods : defaultMethods;
+    const silenced = toRestore.filter(method => !this.methods.includes(method));
+    // Restore the methods that are not already in the current methods
+    this.setMethods(this.methods.concat(silenced));
+  }
+
+  // Clone the current logger with a new name extension separated by '/',
+  // eg clone('@ohif').clone('extension') will produce '@ohif/extension'
+  public clone(nameExt: string) {
+    return new Logger(`${this.name}/${nameExt}`, this.style, this.methods);
   }
 }
 
-export const logger = new Logger();
-export default logger;
+export const defaultLogger = new Logger();
+export default defaultLogger;

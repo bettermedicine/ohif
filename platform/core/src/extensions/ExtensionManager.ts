@@ -2,7 +2,7 @@ import { CommandsManager, HotkeysManager } from '../classes';
 import { PubSubService, ServiceProvidersManager } from '../services';
 import type { DataSourceDefinition } from '../types';
 import type AppTypes from '../types/AppTypes';
-import { Logger } from '../utils';
+import { defaultLogger, Logger } from '../utils';
 import MODULE_TYPES from './MODULE_TYPES';
 
 /**
@@ -105,8 +105,7 @@ export default class ExtensionManager extends PubSubService {
     this.registeredExtensionIds = [];
     this.moduleTypeNames = Object.values(MODULE_TYPES);
 
-    this.logger = new Logger();
-    this.logger.addPrefix('ExtensionManager');
+    this.logger = defaultLogger.clone('ExtensionManager');
     this.logger.debug('initializing');
 
     //
