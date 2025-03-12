@@ -5,7 +5,8 @@ import publicUrl from '../utils/publicUrl';
 /*
   Routes uniquely define an entry point to:
   - A mode
-  - Linked to a data source
+  - A mode route
+  - A data source
   - With a specified data set.
 
   The full route template is:
@@ -21,6 +22,14 @@ import publicUrl from '../utils/publicUrl';
   A default source can be specified at the app level configuration, and then that source is used if :sourceType is omitted:
 
   /:modeId/:modeRoute/?queryParameters=example
+
+  Additionally, not specifying a modeRoute will default to the first route defined in the mode:
+
+  /:modeId/?queryParameters=example
+
+  You can still specify a sourceType in this case - the first mode route will be used with the specified sourceType:
+
+  /:modeId/:sourceType/?queryParameters=example
  */
 export default function buildModeRoutes({
   modes,
@@ -39,12 +48,16 @@ export default function buildModeRoutes({
       dataSourceNames.push(sourceName);
     }
   });
-
+  const allPaths = new Set<string>();
   modes.forEach(mode => {
-    // todo: for each route. add route to path.
     dataSourceNames.forEach(dataSourceName => {
-      const path = `${publicUrl}${mode.routeName}/${dataSourceName}`;
-
+      const datasourcePath = `${publicUrl}${mode.routeName}/${dataSourceName}`;
+      if (allPaths.has(datasourcePath)) {
+        console.warn(
+          `Duplicate path '${datasourcePath}' in buildModeRoutes, mode ${mode.routeName}, dataSource ${dataSourceName}`
+        );
+      }
+      allPaths.add(datasourcePath);
       // TODO move up.
       const children = () => (
         <ModeRoute
@@ -58,15 +71,43 @@ export default function buildModeRoutes({
       );
 
       routes.push({
-        path,
+        path: datasourcePath,
         children,
         private: true,
+      });
+
+      mode.routes.forEach(route => {
+        const path = `/${mode.routeName}/${route.path}/${dataSourceName}`;
+        if (allPaths.has(path)) {
+          console.warn(
+            `Duplicate path '${path}' in buildModeRoutes, mode ${mode.routeName}, route ${route.path}, dataSource ${dataSourceName}`
+          );
+        }
+        allPaths.add(path);
+        // TODO move up.
+        const children = () => (
+          <ModeRoute
+            mode={mode}
+            modeRoutePath={route.path}
+            dataSourceName={dataSourceName}
+            extensionManager={extensionManager}
+            servicesManager={servicesManager}
+            commandsManager={commandsManager}
+            hotkeysManager={hotkeysManager}
+          />
+        );
+
+        routes.push({
+          path,
+          children,
+          private: true,
+        });
       });
     });
 
     // Add active DataSource route.
     // This is the DataSource route for the active data source defined in ExtensionManager.getActiveDataSource
-    const path = `${publicUrl}${mode.routeName}`;
+    const modePath = `${publicUrl}${mode.routeName}`;
 
     // TODO move up.
     const children = () => (
@@ -79,10 +120,42 @@ export default function buildModeRoutes({
       />
     );
 
+    if (allPaths.has(modePath)) {
+      console.warn(`Duplicate path '${modePath}' in buildModeRoutes, mode ${mode.routeName}`);
+    }
+    allPaths.add(modePath);
+
     routes.push({
-      path,
+      path: modePath,
       children,
-      private: true,
+      private: true, // todo: all mode routes are private for now
+    });
+
+    mode.routes.forEach(route => {
+      const path = `/${mode.routeName}/${route.path}`;
+      if (allPaths.has(path)) {
+        console.warn(
+          `Duplicate path '${path}' in buildModeRoutes, mode ${mode.routeName}, route ${route.path}`
+        );
+      }
+      allPaths.add(path);
+
+      const children = () => (
+        <ModeRoute
+          mode={mode}
+          modeRoutePath={route.path}
+          extensionManager={extensionManager}
+          servicesManager={servicesManager}
+          commandsManager={commandsManager}
+          hotkeysManager={hotkeysManager}
+        />
+      );
+
+      routes.push({
+        path,
+        children,
+        private: true,
+      });
     });
   });
 
